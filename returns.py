@@ -18,7 +18,7 @@ def GAE(next_value, rewards, masks, values, args):
     """
     Calculate the Generalized Advantage Estimation return as proposed in Schulman et al. 2015
 
-    :param next_value: value estimation at timestep t+1
+    :param next_value: value estimation at timestep t+1 (used to estimate Qsa)
     :param rewards: rewards for each timestep
     :param masks: masks for env multiprocessing
     :param values: state value estimates for each timestep
@@ -29,10 +29,15 @@ def GAE(next_value, rewards, masks, values, args):
     gae = 0
     returns = []
     for step in reversed(range(len(rewards))):
-        delta = rewards[step] + args.gamma * values[step + 1] * masks[step] - values[step]
+
+        Qsa = rewards[step] + args.gamma * values[step + 1] * masks[step]
+        Vs  = values[step]
+        delta = Qsa - Vs
+
         gae = delta + args.gamma * args.gae_lambda * masks[step] * gae
         returns.insert(0, gae + values[step])
 
+    # Still normalize the returns
     returns = torch.stack(returns).detach()
     returns = (returns - returns.mean()) / (returns.std() + 1e-10)
     return returns
