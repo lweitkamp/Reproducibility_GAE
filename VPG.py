@@ -25,8 +25,8 @@ def policy_gradient(logp_actions, state_values, returns):
 
 def train(args):
     print(args)
-    envs = SubprocVecEnv([make_env(args.env) for _ in range(args.num_envs)])
-    test_env = gym.make(args.env)
+    envs = SubprocVecEnv([make_env(args.env, i) for i in range(args.num_envs)])
+    test_env = gym.make(args.env); test_env.seed(42)
     policy = ActorCriticMLP(input_dim=envs.observation_space.shape[0], n_acts=envs.action_space.n)
     optim = torch.optim.Adam(params=policy.parameters(), lr=args.lr)
 
@@ -78,13 +78,15 @@ parser = argparse.ArgumentParser(description='Vanilla Policy Gradient Training')
 parser.add_argument('--env', type=str, default='CartPole-v0', help='gym environment name')
 parser.add_argument('--num_envs', type=int, default=16, help='number of parallel environments to run')
 parser.add_argument('--num_steps', type=int, default=20, help='number of steps the agent takes before updating')
-parser.add_argument('--lr', type=float, default=3e-3, help='Learning rate for optimizer')
+parser.add_argument('--lr', type=float, default=3e-2, help='Learning rate for optimizer')
 parser.add_argument('--max_steps', type=int, default=100000, help='maximum number of steps to take in the env')
 parser.add_argument('--test_every', type=int, default=1000, help='get testing values')
 parser.add_argument('--gamma', type=float, default=0.99, help='discount factor')
 parser.add_argument('--gae_lambda', type=float, default=0.97, help='GAE lambda, variance adjusting parameter')
 
 if __name__ == '__main__':
+    torch.manual_seed(42)
+    np.random.seed(42)
     ARGS = parser.parse_args()
     writer = SummaryWriter('runs')
     train(ARGS)

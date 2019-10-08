@@ -6,9 +6,10 @@ import numpy as np
 from multiprocessing import Process, Pipe
 
 
-def make_env(env_name):
+def make_env(env_name, seed_idx):
     def _thunk():
         env = gym.make(env_name)
+        env.seed(seed_idx)
         return env
 
     return _thunk
