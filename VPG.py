@@ -25,7 +25,7 @@ def policy_gradient(logp_actions, state_values, returns):
 
 def train(args):
     print(args)
-    envs = SubprocVecEnv([make_env(args.env, i) for i in range(args.num_envs)])
+    envs = SubprocVecEnv([make_env(args.env, i) for i in range(args.num_envs)], args.MC)
     test_env = gym.make(args.env); test_env.seed(42)
     policy = ActorCriticMLP(input_dim=envs.observation_space.shape[0], n_acts=envs.action_space.n)
     optim = torch.optim.Adam(params=policy.parameters(), lr=args.lr)
@@ -54,7 +54,6 @@ def train(args):
             state_values.append(state_value)
             rewards.append(torch.FloatTensor(reward).unsqueeze(1))
             masks.append(torch.FloatTensor(1 - done).unsqueeze(1))
-
             obs = torch.from_numpy(obs)
             steps += 1
 
@@ -65,6 +64,9 @@ def train(args):
                 writer.add_scalar('rewards/test', float(running_reward), steps)
                 print(f"Running reward at timestep {steps}: {running_reward}. and {test_reward}")
 
+            if (1-done).sum() == 0:
+                break
+
         _, next_value = policy(obs)
         returns = GAE(next_value, rewards, masks, state_values, args)
         loss = policy_gradient(logp_actions, state_values, returns)
@@ -72,6 +74,10 @@ def train(args):
         optim.zero_grad()
         loss.backward()
         optim.step()
+        # if monte carlo, reset after
+        if args.num_steps == 200:
+            obs = torch.from_numpy(envs.reset())
+
 
 
 parser = argparse.ArgumentParser(description='Vanilla Policy Gradient Training')
@@ -83,6 +89,7 @@ parser.add_argument('--max_steps', type=int, default=100000, help='maximum numbe
 parser.add_argument('--test_every', type=int, default=1000, help='get testing values')
 parser.add_argument('--gamma', type=float, default=0.99, help='discount factor')
 parser.add_argument('--gae_lambda', type=float, default=0.97, help='GAE lambda, variance adjusting parameter')
+parser.add_argument('--MC', type=bool, default=False, help='Match n-steps with the number of steps of termination')
 
 if __name__ == '__main__':
     torch.manual_seed(42)
