@@ -25,8 +25,8 @@ def policy_gradient(logp_actions, state_values, returns):
 
 def train(args):
     print(args)
-    envs = SubprocVecEnv([make_env(args.env, i) for i in range(args.num_envs)], args.MC)
-    test_env = gym.make(args.env); test_env.seed(42)
+    envs = SubprocVecEnv([make_env(args.env, i + args.num_envs) for i in range(args.num_envs)], args.MC)
+    test_env = gym.make(args.env); test_env.seed(args.seed + args.num_envs)
     policy = ActorCriticMLP(input_dim=envs.observation_space.shape[0], n_acts=envs.action_space.n)
     optim = torch.optim.Adam(params=policy.parameters(), lr=args.lr)
 
@@ -90,10 +90,11 @@ parser.add_argument('--test_every', type=int, default=1000, help='get testing va
 parser.add_argument('--gamma', type=float, default=0.99, help='discount factor')
 parser.add_argument('--gae_lambda', type=float, default=0.97, help='GAE lambda, variance adjusting parameter')
 parser.add_argument('--MC', type=bool, default=False, help='Match n-steps with the number of steps of termination')
+parser.add_argument('--seed', type=int, default=42, help='random seed')
 
 if __name__ == '__main__':
-    torch.manual_seed(42)
-    np.random.seed(42)
     ARGS = parser.parse_args()
     writer = SummaryWriter('runs')
+    torch.manual_seed(ARGS.seed)
+    np.random.seed(ARGS.seed)
     train(ARGS)
