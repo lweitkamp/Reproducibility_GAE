@@ -22,7 +22,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_envs', type=int, default=16, help='number of parallel environments to run')
     parser.add_argument('--num_steps', type=int, default=20, help='number of steps the agent takes before updating')
     parser.add_argument('--lr', type=float, default=3e-2, help='Learning rate for optimizer')
-    parser.add_argument('--max_steps', type=int, default=10000, help='maximum number of steps to take in the env')
+    parser.add_argument('--max_steps', type=int, default=50000, help='maximum number of steps to take in the env')
     parser.add_argument('--test_every', type=int, default=1000, help='get testing values')
     parser.add_argument('--gamma', type=float, default=0.99, help='discount factor')
     parser.add_argument('--gae_lambda', type=float, default=0.97, help='GAE lambda, variance adjusting parameter')
