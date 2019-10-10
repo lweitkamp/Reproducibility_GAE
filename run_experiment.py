@@ -5,7 +5,7 @@ from VPG import train
 
 learning_rates = [0.001, 0.003, 0.005, 0.07, 0.09, 0.01, 0.02, 0.03, 0.05, 0.07, 0.1]
 n_steps = [1, 10, 20, 30, 40, 50, 100, 150, 200]
-seeds = [30*i for i in range(10)]
+seeds = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270]
 returns = ["GAE", "Q", "A"]
 OUTPUT_FOLDER = "results"
 
