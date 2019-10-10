@@ -14,7 +14,7 @@ import torch
 def returns():
     raise NotImplementedError
 
-def Advantage(next_value, rewards, masks, values, args):
+def A(next_value, rewards, masks, values, args):
     values = values + [next_value]
     returns = []
     for step in reversed(range(len(rewards))):
