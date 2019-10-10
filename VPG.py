@@ -40,14 +40,13 @@ def train(args):
     envs = SubprocVecEnv([make_env(args.env, i + args.num_envs) for i in range(args.num_envs)], MONTE_CARLO)
     test_env = gym.make(args.env); test_env.seed(args.seed + args.num_envs)
     policy = ActorCriticMLP(input_dim=envs.observation_space.shape[0], n_acts=envs.action_space.n)
-    optim = torch.optim.Adam(params=policy.parameters(), lr=args.lr)
+    optim = torch.optim.Adam(params=policy.parameters(), lr=args.lr, weight_decay=1e-5)
 
     test_rewards = []
     steps = 1
 
     obs = torch.from_numpy(envs.reset())
     while steps < args.max_steps:
-
         logp_actions = []
         state_values = []
         rewards      = []
@@ -55,9 +54,12 @@ def train(args):
 
         for _ in range(args.num_steps):
             probs, state_value = policy.forward(obs)
-
             dist = Categorical(probs)
             action = dist.sample()
+            # try:
+            #     action = dist.sample()
+            # except:
+            #     print(obs, state_value, probs)
 
             obs, reward, done, _ = envs.step(action.numpy())
 
@@ -77,7 +79,10 @@ def train(args):
             if (1-done).sum() == 0:
                 break
 
-        _, next_value = policy(obs)
+        next_value = 0
+        if not (1-done).sum() == 0:
+            _, next_value = policy(obs)
+
         returns = return_function(next_value, rewards, masks, state_values, args)
         loss = policy_gradient(logp_actions, state_values, returns)
 
