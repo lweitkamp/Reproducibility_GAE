@@ -6,9 +6,7 @@ from VPG import train
 # TO SPLIT UP THE COMPUTE, REMOVE THE RETURNS YOU ARE NOT GOING TO RUN
 # IF INTERUPTED: REMOVE THE learning_rates AND n_steps YOU HAVE DONE ALREADY TO CONTINUE WHERE YOU LEFT
 learning_rates = [0.0001, 0.0003, 0.0005, 0.0009, 0.001, 0.003, 0.005, 0.007, 0.009, 0.01]
-# learning_rates = [0.005, 0.07, 0.09, 0.01, 0.02, 0.03, 0.05, 0.07, 0.1]
 n_steps = [1, 10, 20, 30, 40, 50, 100, 150, 200]
-# n_steps = [10, 20, 30, 40, 50, 100, 150, 200]
 seeds = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270]
 returns = ["GAE", "Q", "A"]
 OUTPUT_FOLDER = "results"
@@ -59,17 +57,17 @@ if __name__ == '__main__':
 
             for rf in returns:
                 ARGS.return_function = rf
-                output_folder = os.path.join(output_folder, rf)
-                os.makedirs(output_folder, exist_ok=True)
+                rf_output_folder = os.path.join(output_folder, rf)
+                os.makedirs(rf_output_folder, exist_ok=True)
 
                 for num_steps in n_steps:
                     ARGS.num_steps = num_steps
-                    output_folder = os.path.join(output_folder, str(num_steps))
-                    os.makedirs(output_folder, exist_ok=True)
+                    tmp_output_folder = os.path.join(rf_output_folder, str(num_steps))
+                    os.makedirs(tmp_output_folder, exist_ok=True)
                     for lr in learning_rates:
                         ARGS.lr = lr
                         filename = f"{ARGS.lr}.txt"
-                        filepath = os.path.join(output_folder, filename)
+                        filepath = os.path.join(tmp_output_folder, filename)
                         results = train(ARGS)
                         write_to_file(filepath, results)
 
