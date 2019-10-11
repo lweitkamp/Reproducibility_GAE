@@ -18,7 +18,7 @@ def policy_gradient(logp_actions, state_values, returns):
 
     actor_loss = -(logp_actions * advantage.detach())
     critic_loss = advantage.pow(2)
-    loss = (actor_loss + critic_loss).sum()
+    loss = (actor_loss + critic_loss).mean()
     return loss
 
 
@@ -40,7 +40,7 @@ def train(args):
     envs = SubprocVecEnv([make_env(args.env, i + args.num_envs) for i in range(args.num_envs)], MONTE_CARLO)
     test_env = gym.make(args.env); test_env.seed(args.seed + args.num_envs)
     policy = ActorCriticMLP(input_dim=envs.observation_space.shape[0], n_acts=envs.action_space.n)
-    optim = torch.optim.Adam(params=policy.parameters(), lr=args.lr, weight_decay=1e-5)
+    optim = torch.optim.Adam(params=policy.parameters(), lr=args.lr, weight_decay=1e-2)
 
     test_rewards = []
     steps = 1
@@ -88,6 +88,8 @@ def train(args):
 
         optim.zero_grad()
         loss.backward()
+        # torch.nn.utils.clip_grad_norm_(policy.parameters(), 10)
+
         optim.step()
         # if monte carlo, we need to reset the environment by hand
         if MONTE_CARLO:
