@@ -62,7 +62,7 @@ def GAE(next_value, rewards, masks, values, args):
         delta = Qsa - Vs
 
         gae = delta + args.gamma * args.gae_lambda * masks[step] * gae
-        returns.insert(0, gae + values[step])
+        returns.insert(0, gae)
 
     # Still normalize the returns
     returns = torch.stack(returns).detach()

@@ -10,15 +10,13 @@ from models import ActorCriticMLP
 from utils import test
 from returns import GAE, Q, A
 
-def policy_gradient(logp_actions, state_values, returns):
+
+def policy_gradient(logp_actions, returns):
     logp_actions = torch.stack(logp_actions)
-    state_values = torch.stack(state_values)
 
-    advantage = returns - state_values
-
-    actor_loss = -(logp_actions * advantage.detach())
-    critic_loss = advantage.pow(2)
-    loss = (actor_loss + critic_loss).mean()
+    actor_loss = -(logp_actions * returns.detach())
+    critic_loss = returns.pow(2)
+    loss = (actor_loss + critic_loss).sum()
     return loss
 
 
@@ -84,7 +82,7 @@ def train(args):
             _, next_value = policy(obs)
 
         returns = return_function(next_value, rewards, masks, state_values, args)
-        loss = policy_gradient(logp_actions, state_values, returns)
+        loss = policy_gradient(logp_actions, returns)
 
         optim.zero_grad()
         loss.backward()

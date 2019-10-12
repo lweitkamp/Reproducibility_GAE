@@ -5,9 +5,10 @@ from VPG import train
 
 # TO SPLIT UP THE COMPUTE, REMOVE THE RETURNS YOU ARE NOT GOING TO RUN
 # IF INTERUPTED: REMOVE THE learning_rates AND n_steps YOU HAVE DONE ALREADY TO CONTINUE WHERE YOU LEFT
+# ADJUST YOUR LEARNING RATES TO Q OR A OR GAE
 learning_rates = [0.0001, 0.0003, 0.0005, 0.0009, 0.001, 0.003, 0.005, 0.007, 0.009, 0.01]
 n_steps = [1, 10, 20, 30, 40, 50, 100, 150, 200]
-seeds = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270]
+seeds = [0, 30, 60, 90, 120]
 returns = ["GAE", "Q", "A"]
 OUTPUT_FOLDER = "results"
 
