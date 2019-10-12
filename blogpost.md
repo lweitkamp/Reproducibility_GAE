@@ -1,33 +1,44 @@
-# Generalized Advantage Estimation
-
-Generalized Advantage Estimation (GAE) is used in most state of the art policy gradient methods. In this blogpost we compare actor-critic methods and the use of (Generalized) Advantage Estimation to reduce the variance in gradient updates. 
-
-In actor-critic methods, a baseline is used to reduce the variance of the gradient updates. Different functions for this baseline are possible, like the true value or action function. However we cannot always access these true value or action functions and thus we will estimate these as well. This however induces some bias in the gradient updates. Schulman et al. [^1] claim that their Generalized Advantage Estimation contains less variance than the estimated value and action functions. To check their claim we will use a vanilla policy gradient algorithm that uses the different baselines and compare their performances. 
+# Measuring the Effect of Advantage Estimation in Actor-Critic methods
 
 
 
-## Policy gradients and GAE
+For the reinforcement learning course at the UvA we are given the task of creating reproducible research, where we can choose from a number of topics.
+We have chosen to focus on $n-$step bootstrapping in actor-critic methods, where in specific we want to focus on variance reduction methods such
+as the advantage estimation and the generalized advantage estimation (GAE), which naturally leads to the following question:
 
-Policy gradient methods maximize the expected total reward. They estimate the gradient, $g:=\nabla_\theta\mathbb{E}[\sum_{t=0}^\infty r_t]$, repeatedly to get the optimal policy. There exist different forms of the policy gradient where the $\Psi$ below can be filled in using different targets, like the total rewards of the episode, the rewards following action $a_t$, the state-action value, advantage function, etc.  
+​								*What is the effect of (generalized) advantage estimation on the return in $n$-step bootstrapping?*
 
+This blog post is meant to answer that question. First, we will give a quick overview of actor critic methods, $n$-step bootstrapping and the (generalized) advantage function. Second, we will discuss our setup which involves a detailed explanation of how the results can be reproduced. Third, we will give an analysis of the results which should answer the question above.
 
+## Actor Critic Methods and Advantage Estimation
 
-
-
-
-
-
+In reinforcement learning we typically want to maximize the total expected reward, which can be done using various methods. We can for example choose to learn the value function(s) for each state and infer the policy from this, or learn the policy directly through parameterization of the policy. Actor critic methods combine the two approaches: the actor is a parameterized policy, the critic learns the value for each state through bootstrapping[^4]:
 $$
-g = \mathbb{E}\left[ \sum_{t=0}^\infty \Psi_t \nabla_\theta \log \pi_\theta (a_t|s_t) \right]
+\begin{align*}
+\nabla_{\boldsymbol{\theta}} J(\boldsymbol{\theta})&= \mathbb{E}\left[ \sum_{t=0}^\infty \nabla_\theta \log \pi_\theta (a_t|s_t) \big(r_{t} + \gamma \hat{v}(s_{t+1})  \big)\right] \\
+&= \mathbb{E}\left[ \sum_{t=0}^\infty \nabla_\theta \log \pi_\theta (a_t|s_t)\hat{q}(s_t, a_t)\right]
+\end{align*}
 $$
+This estimate is however biased (due to bootstrapping) and can exhibit high variance (a common problem in policy gradient based methods). Bias is hard to tackle, but we can reduce variance through the introduction of the advantage function $\hat{A}$:
+$$
+\begin{align*}
+\nabla_{\boldsymbol{\theta}} J(\boldsymbol{\theta})&= \mathbb{E}\left[ \sum_{t=0}^\infty \nabla_\theta \log \pi_\theta (a_t|s_t) \hat{A}\right] \\
+\nabla_{\boldsymbol{\theta}} J(\boldsymbol{\theta})&= \mathbb{E}\left[ \sum_{t=0}^\infty \nabla_\theta \log \pi_\theta (a_t|s_t) \big(\hat{q}(s_t, a_t) - \hat{v}(s_t))\right]
+\end{align*}
+$$
+The Advantage function tells us how good an action $a$ was in state $s$ compared to other actions we could have taken, so it tells us what the *advantage* of taking this action. If the action taken lead to a high return, we would like to increase the probability of taking that action! 
 
+### N-step bootstrapping
 
+1. explain n-step bootstrapping
+2. how does it affect the return (monte-carlo returns are unbiased, but are they better?)
 
+### Generalized Advantage Estimation
 
+We now turn to an idea proposed in the paper *High Dimensional Continuous Control Using Generalized Advantage Estimation*[^1] by Schulman et al. 2016. The advantage function reduces variance, but the authors claim we can do better: learn an exponentially-weighted estimator of the advantage function. This is what they call Generalized Advantage Estimation
 
-
-
-
+1. some math
+2. thorough explanation of parameters i guess?
 
 ## Setup 
 
@@ -39,10 +50,15 @@ our code base can be found <a href="https://github.com/lweitkamp/Reproducibility
 
 
 
+## Results and Analysis
 
 
-#### Citations 
+
+
+
+## Citations
 
 [^1]:  Schulman, J., Moritz, P., Levine, S., Jordan, M., & Abbeel, P. (2015). High-dimensional continuous control using generalized advantage estimation. *arXiv preprint arXiv:1506.02438*.
 [^2]: https://github.com/pytorch/examples/blob/master/reinforcement_learning/actor_critic.py
 [^3]: https://github.com/ikostrikov/pytorch-a3c
+[^4]: Actually, bootstrapping is what defines actor critic methods when contrasted to vanilla policy gradient methods.
