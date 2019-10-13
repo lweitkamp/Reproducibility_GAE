@@ -38,7 +38,7 @@ def train(args):
     envs = SubprocVecEnv([make_env(args.env, i + args.num_envs) for i in range(args.num_envs)], MONTE_CARLO)
     test_env = gym.make(args.env); test_env.seed(args.seed + args.num_envs)
     policy = ActorCriticMLP(input_dim=envs.observation_space.shape[0], n_acts=envs.action_space.n)
-    optim = torch.optim.Adam(params=policy.parameters(), lr=args.lr, weight_decay=1e-2)
+    optim = torch.optim.Adam(params=policy.parameters(), lr=args.lr, weight_decay=1e-2)#1e-2, 5e-2
 
     test_rewards = []
     steps = 1
