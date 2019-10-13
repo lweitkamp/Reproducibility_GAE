@@ -41,11 +41,15 @@ We now turn to an idea proposed in the paper *High Dimensional Continuous Contro
 ## Setup 
 
 In our experiment we performed a grid search over the learning rate and the n-step return. 
-For gamma we took 0.99 and for the lambda in GAE we took 0.97. Schulman et al. [^1]  show that these values work best with the GAE. We experiment with two other targets as well, these are the $n$-step Q-value and $n$-step Advantage. The Q-value is defined as $r_{t+1} + \gamma v_w (s_{t+1})$ and the Advantage is $r_{t+1} + \gamma v_w (s_{t+1}) - v_w(s)$. These returns are calculated for $n$-steps and normalised. 
+For gamma we took 0.99 and for the lambda in GAE we took 0.97. Schulman et al. [^1]  show that these values work best with the GAE. 
+We experiment with another target as well, the $n$-step Advantage, which is defined as $r_{t+1} + \gamma v_w (s_{t+1}) - v_w(s)$. 
+These returns are calculated for $n$-steps and normalised. 
 
 TODO: explain how the returns are generalised to $n$-steps.
 
-To ensure reproducability, we have manually set the seeds for _pytorch_ and the _gym_ environments. We use seeds [0, 30, 60, 90, 120] for _pytorch_ and the environments use seeds 16 to 31, where the seeds are determined by the number of workers (environment instances) we have. In our case this is 16, the seeds are calculated roughly as followed:
+To ensure reproducability, we have manually set the seeds for _pytorch_ and the _gym_ environments. 
+We use seeds [0, 30, 60, 90, 120] for _pytorch_ and the environments use seeds 16 to 31, where the seeds are determined by the number of workers (environment instances) we have. 
+In our case this is 16, the seeds are calculated roughly as followed:
 
 ```seeds = [i + num_envs for i in range(num_envs)]``` 
 
@@ -55,7 +59,7 @@ The learning rates we investigate are given in the following table:
 
 | Return type | learning rates |
 | ----------- | ---- |
-| Q, A          | [0.0001, 0.0003, 0.0005, 0.0009, 0.001, 0.003, 0.005, 0.007, 0.009, 0.01]     |
+| A          | [0.001, 0.003, 0.005, 0.007, 0.009, 0.01]     |
 | GAE           |[0.01, 0.03, 0.05, 0.09, 0.1]     |
 
 Our experimental results are obtained by iterating over the pytorch seeds, after which we iterate over the number of steps and finally over the possible learning rates. We do this for every return type. 
