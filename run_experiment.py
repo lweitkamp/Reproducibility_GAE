@@ -32,6 +32,7 @@ if __name__ == '__main__':
     parser.add_argument('--gae_lambda', type=float, default=0.97, help='GAE lambda, variance adjusting parameter')
     parser.add_argument('--return_function', type=str, default="GAE", help='The returns function we use from {GAE, Q, A}')
     parser.add_argument('--seed', type=int, default=-1, help='random seed')
+    parser.add_argument('--weight_decay', type=float, default=1e-2, help='weight decay')
 
     ARGS = parser.parse_args()
 

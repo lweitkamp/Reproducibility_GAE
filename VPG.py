@@ -38,7 +38,7 @@ def train(args):
     envs = SubprocVecEnv([make_env(args.env, i + args.num_envs) for i in range(args.num_envs)], MONTE_CARLO)
     test_env = gym.make(args.env); test_env.seed(args.seed + args.num_envs)
     policy = ActorCriticMLP(input_dim=envs.observation_space.shape[0], n_acts=envs.action_space.n)
-    optim = torch.optim.Adam(params=policy.parameters(), lr=args.lr, weight_decay=1e-2)#1e-2, 5e-2
+    optim = torch.optim.Adam(params=policy.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
     test_rewards = []
     steps = 1
@@ -105,6 +105,7 @@ if __name__ == '__main__':
     parser.add_argument('--gamma', type=float, default=0.99, help='discount factor')
     parser.add_argument('--gae_lambda', type=float, default=0.97, help='GAE lambda, variance adjusting parameter')
     parser.add_argument('--seed', type=int, default=42, help='random seed')
+    parser.add_argument('--weight_decay', type=float, default=1e-2, help='weight decay')
     parser.add_argument('--return_function', type=str, default="GAE", help='The returns function we use from {GAE, Q, A}')
 
     ARGS = parser.parse_args()
