@@ -60,6 +60,9 @@ The learning rates we investigate are given in the following table:
 
 Our experimental results are obtained by iterating over the pytorch seeds, after which we iterate over the number of steps and finally over the possible learning rates. We do this for every return type. 
 
+During training we use the Adam optimizer. In some cases the weights exploded, that is why we use weight decay, speficially weight_decay=1e-2. 
+In some particular setups it still exploded, we then used weight_decay=5e-2 to make it work. 
+
 Our code base can be found <a href="https://github.com/lweitkamp/Reproducibility_GAE">here</a>, which is inspired by other implementations[^2][^3], 
 
 
