@@ -49,6 +49,8 @@ To ensure reproducability, we have manually set the seeds for _pytorch_ and the 
 
 ```seeds = [i + num_envs for i in range(num_envs)]``` 
 
+We investigate the number of steps used in the $n$-steps. The various number of $n$ are: `[1, 10, 20, 30, 40, 50, 100, 150, 200]`. Note that $n=200$ corresponds to the MC estimate.
+
 The learning rates we investigate are given in the following table:
 
 | Return type | learning rates |
