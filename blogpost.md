@@ -1,12 +1,10 @@
 # Measuring the Effect of Advantage Estimation in Actor-Critic methods
 
-For the reinforcement learning course at the UvA we are given the task of creating reproducible research, where we can choose from a number of topics.
-We have chosen to focus on $n-$step bootstrapping in actor-critic methods, where in specific we want to focus on variance reduction methods such
-as the advantage estimation and the generalized advantage estimation (GAE), which naturally leads to the following question:
+For the reinforcement learning course at the UvA we are given the task of creating reproducible research, where we can choose from a number of topics. We have chosen to focus on $n-$step bootstrapping in actor-critic methods, which traditionally exhibit high variance for higher $n$ and high bias for lower $n$. In specific, we want to compare variance reduction methods such as the advantage estimation and the generalized advantage estimation. This naturally leads to the following question:
 
 *What is the effect of (generalized) advantage estimation on the return in $n$-step bootstrapping?*
 
-This blog post is meant to answer that question. First, we will give a quick overview of actor critic methods, $n$-step bootstrapping and the (generalized) advantage function. Second, we will discuss our setup which involves a detailed explanation of how the results can be reproduced. Third, we will give an analysis of the results which should answer the question above.
+This blog post is meant to answer that question. First, we will give a quick overview of actor critic methods, $n$-step bootstrapping and the (generalized) advantage function. Second, we will discuss our setup which involves a detailed explanation of how the results can be reproduced. Third, we will give an analysis of the results which should answer the question above. Our code base can be found <a href="https://github.com/lweitkamp/Reproducibility_GAE">here</a>, which is inspired by other implementations[^2][^3].
 
 ## Actor Critic Methods and Advantage Estimation
 
@@ -24,52 +22,71 @@ $$
 \nabla_{\boldsymbol{\theta}} J(\boldsymbol{\theta})&= \mathbb{E}\left[ \sum_{t=0}^\infty \nabla_\theta \log \pi_\theta (a_t|s_t) \big(\hat{q}(s_t, a_t) - \hat{v}(s_t))\right]
 \end{align*}
 $$
-The Advantage function tells us how good an action $a$ was in state $s$ compared to other actions we could have taken, so it tells us what the *advantage* of taking this action. If the action taken lead to a high return, we would like to increase the probability of taking that action! 
+The Advantage function tells us how good an action $a$ was in state $s$ compared to other actions we could have taken, so it tells us what the *advantage* of taking this action. If the action taken in state $s$ leads to a high return, we would like to increase the probability of taking that action in state $s$.
 
 ### N-step bootstrapping
 
-1. explain n-step bootstrapping
-2. how does it affect the return (monte-carlo returns are unbiased, but are they better?)
+Monte carlo based methods have one big disadvantage: we have to wait for the end of an episode to perform a backup. We can tackle this disadvantage by performing $n$-step bootstrapping with $n \in \mathbb{Z}$. There is ofcourse no free lunch, and performing boostrapping does have the effect of (possibly) inducing bias to our estimate (this is especially true for $n$ close to 1). If we combine actor-critic methods with $n-$step learning and advantage estimation, it is commonly known as advantage actor critic (A2C). 
+
+In code, estimating the advantage function through bootstrapping looks like this:
+
+```python
+def A(next_value, rewards, values, gamma):
+    values = values + [next_value] # we need an extra value for bootstrapping Qsa
+    returns = []
+    for step in reversed(range(len(rewards))):
+        Qsa = rewards[step] + gamma * values[step + 1]
+        Vs  = values[step]
+        A = Qsa - Vs
+        returns.insert(0, A)
+
+    return returns
+```
 
 ### Generalized Advantage Estimation
 
-We now turn to an idea proposed in the paper *High Dimensional Continuous Control Using Generalized Advantage Estimation*[^1] by Schulman et al. 2016. The advantage function reduces variance, but the authors claim we can do better: learn an exponentially-weighted estimator of the advantage function. This is what they call Generalized Advantage Estimation
+We now turn to an idea proposed in the paper *High Dimensional Continuous Control Using Generalized Advantage Estimation*[^1] by Schulman et al. 2016. The advantage function reduces variance, but the authors claim we can do better: learn an exponentially-weighted estimator of the advantage function. This is what they call Generalized Advantage Estimation:
+$$
+\hat{A}^{\text{GAE}(\gamma, \lambda)}_t = \sum^{\infty}_{l=0} (\gamma \lambda)^{l} \delta^V_{t+l}
+$$
+Where $\delta^V_{t} = r_t + \gamma V(s_{t+1}) - V(s_t)$ is the bootstrapped estimate for $\hat{A}_t$. The parameter $0 < \lambda < 1$ governs a trade-off between variance ($\lambda \approx 1$) and bias $(\lambda \approx 0)$. this is ***bias on top of bias***! But the authors note that it is a bias we can permit, as it reduces the variance to such a degree to enable quick learning. Additionally, the authors note that it is desireable to set $\lambda << \gamma$ as to balance bis and variance. In code, it looks like this:
 
-1. some math
-2. thorough explanation of parameters i guess?
+```python
+def GAE(next_value, rewards, values, gamma, GAE_lambda):
+    values = values + [next_value]
+    gae = 0
+    returns = []
+    for step in reversed(range(len(rewards))):
+        Qsa = rewards[step] + gamma * values[step + 1]
+        Vs  = values[step]
+        delta = Qsa - Vs
+
+        gae = delta + gamma * GAE_lambda * gae
+        returns.insert(0, gae)
+
+    return returns
+```
+
+Not *that* different when compared to the vanilla version, which makes it easy to implement.
 
 ## Setup 
 
+To answer our research question "*What is the effect of (generalized) advantage estimation on the return in $n$-step bootstrapping?*", we will vary the learning rate over different $n$-step bootstrapping methods. When we have found the optimal learning rates for the $n$-step bootstrapping methods, we will compare the results of these methods with each other to determine the performance of the Advantage and Generalized Advantage Estimation as critics in an actor-critic algorithm. 
+
+For our experiment we have chosen to use the CartPole-v0 environment of the OpenAI gym python package. This environment was chosen due to the simplicity of this environment while still having a quite large state space. More difficult environments have not been tested due to the limited time available for this project. 
+
 In our experiment we performed a grid search over the learning rate and the n-step return. 
-For gamma we took 0.99 and for the lambda in GAE we took 0.97. Schulman et al. [^1]  show that these values work best with the GAE. 
-We experiment with another target as well, the $n$-step Advantage, which is defined as $r_{t+1} + \gamma v_w (s_{t+1}) - v_w(s)$. 
-These returns are calculated for $n$-steps and normalised. 
+For gamma we took 0.99 and for the lambda in GAE we took 0.97. Schulman et al. [^1]  show that these values work best with the GAE. The experiment first searches for the optimal learning rate for each $n$-step. The various numbers of $n$ are: $n \in \{1, 10, 20, 30, 40, 50, 100, 150, 200\}$. Note that $n=200$ corresponds to the MC estimate. For the learning rate we use $lr_A \in \{0.001, 0.003, 0.005, 0.007, 0.009, 0.01\}$ for the Advantage Estimation and $lr_{GAE} \in \{0.01, 0.03, 0.05, 0.07\}$. GAE uses a larger learning rate, because it reduces the variance more than the Advantage Estimation. This makes it able to use larger updates than the normal Advantage Estimation. 
 
-TODO: explain how the returns are generalised to $n$-steps.
+Since this grid search is performed over 5 pytorch seeds, the search for these optimal parameters is qubic. To speed up the experiment somewhat, multi-threading of the environments was used, where 16 environments were played at the same time, all with their own seeds.
 
-To ensure reproducability, we have manually set the seeds for _pytorch_ and the _gym_ environments. 
-We use seeds [0, 30, 60, 90, 120] for _pytorch_ and the environments use seeds 16 to 31, where the seeds are determined by the number of workers (environment instances) we have. 
+### Reproducibility
+
+To ensure reproducibility, we have manually set the seeds for pytorch and the gym environments. 
+We use seeds [0, 30, 60, 90, 120] for _PyTorch_ and *NumPy* and the environments use seeds 16 to 31, where the seeds are determined by the number of workers (environment instances) we have. 
 In our case this is 16, the seeds are calculated roughly as followed:
 
-```seeds = [i + num_envs for i in range(num_envs)]``` 
-
-We investigate the number of steps used in the $n$-steps. The various number of $n$ are: `[1, 10, 20, 30, 40, 50, 100, 150, 200]`. Note that $n=200$ corresponds to the MC estimate.
-
-The learning rates we investigate are given in the following table:
-
-| Return type | learning rates |
-| ----------- | ---- |
-| A          | [0.001, 0.003, 0.005, 0.007, 0.009, 0.01]     |
-| GAE           |[0.01, 0.03, 0.05, 0.09, 0.1]     |
-
-Our experimental results are obtained by iterating over the pytorch seeds, after which we iterate over the number of steps and finally over the possible learning rates. We do this for every return type. 
-
-During training we use the Adam optimizer. In some cases the weights exploded, that is why we use weight decay, speficially weight_decay=1e-2. 
-In some particular setups it still exploded, we then used weight_decay=5e-2 to make it work. 
-
-Our code base can be found <a href="https://github.com/lweitkamp/Reproducibility_GAE">here</a>, which is inspired by other implementations[^2][^3], 
-
-
+```seeds = [i + num_envs for i in range(num_envs)]```
 
 ## Results and Analysis
 
