@@ -73,13 +73,35 @@ Our code base can be found <a href="https://github.com/lweitkamp/Reproducibility
 
 ## Results and Analysis
 
-To determine which setup works best, we first combine the results of all the seeds, sorted by return type, $n$ used in $n$-steps and learning rate. We then calculate the mean over the rewards, and use this to determine which the best setup per return type.
+Now it's time for the results! In order to determine which setup works best, we first combine the results of all the seeds, sorted by return type, $n$ used in $n$-steps and learning rate. We then calculate the mean over the rewards, and use this to show which setup works best per return type.
 
-The results are displayed in the next table:
+The results are displayed in the next table: 
+
+- Table 1: show best learning rates for GAE and AE per $n$ 
+
+In this table we see that ..todo[learning rates can be set higher for higher $n$ in the case that GAE is used. This is due to the variance reduction properties of GAE]. 
 
 
 
+- Figure 1: multiple graphs showing returns for best learning rate of GAE and AE per $n$
 
+Say something about achieved returns, good/not good. Why?
+
+Say something about variance for both methods. Something remarkable? 
+
+
+
+## Conclusion
+
+n < 1 : GAE werkt niet goed, denken high bias by bootstrapping
+
+n > 10: Lr kunnen hoger worden, bias lager door bootstrap over meer stappen. variance lager door GAE vandaar dat dit mogelijk is. 
+
+Limitations: 
+
+
+
+tijdnood, 1 env vanwege tijd. 5 seeds, ook tijdnood
 
 ## Citations
 
