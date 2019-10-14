@@ -1,4 +1,7 @@
 # Measuring the Effect of Advantage Estimation in Actor-Critic methods
+*By Noah van Grinsven, Anton Steenvoorden, Tessa Wagenaar, Laurens Weitkamp.*
+
+
 
 For the reinforcement learning course at the UvA we are given the task of creating reproducible research, where we can choose from a number of topics. We have chosen to focus on $n-$step bootstrapping in actor-critic methods, which traditionally exhibit high variance for higher $n$ and high bias for lower $n$. In specific, we want to compare variance reduction methods such as the advantage estimation and the generalized advantage estimation. This naturally leads to the following question:
 
@@ -83,7 +86,7 @@ For our experiment we have chosen to use the CartPole-v0, and the MountainCar-v0
 <video controls autoplay loop="loop" style="width:100%"><source src="https://gym.openai.com/videos/2019-10-08--6QXvzzSWoV/MountainCar-v0/thumbnail.mp4" type="video/mp4"></video> 
 </div>
 </div>
-*Videos taken from [OpenAI Gym](gym.openai.com)* 
+*Videos taken from [OpenAI Gym](https://gym.openai.com)* 
 
 These environments were chosen for their simplicity, while still having a quite large state space. More difficult environments have not been tested due to the limited time available for this project. 
 
