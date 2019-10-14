@@ -150,7 +150,7 @@ n > 10: Learning rates could be set higher for GAE, This is due to the lowering 
 
 Now it is important to keep in mind that the way these methods are tested is quite limited. In this experiment the returns showed are averaged over a total of 5 seeds, which could give misleading results. 
 
-also, specific for this environment, good to try these methods on other environments.
+Also, specific for this environment, good to try these methods on other environments.
 
 ## Citations
 
