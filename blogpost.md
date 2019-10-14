@@ -83,7 +83,9 @@ For our experiment we have chosen to use the CartPole-v0, and the MountainCar-v0
 <video controls autoplay loop="loop" style="width:100%"><source src="https://gym.openai.com/videos/2019-10-08--6QXvzzSWoV/MountainCar-v0/thumbnail.mp4" type="video/mp4"></video> 
 </div>
 </div>
-This environment was chosen due to the simplicity of this environment while still having a quite large state space. More difficult environments have not been tested due to the limited time available for this project. 
+*Videos taken from [OpenAI Gym](gym.openai.com)* 
+
+These environments were chosen for their simplicity, while still having a quite large state space. More difficult environments have not been tested due to the limited time available for this project. 
 
 In our experiment we performed a grid search over the learning rate and the n-step return. 
 For gamma we took $0.99$ and for the lambda in GAE we took $0.97$. Schulman et al. [^1]  show that these values work best with the GAE. 
@@ -112,19 +114,29 @@ The environments use seeds 16 to 31, where the seeds are determined by the numbe
 
 To determine which setup works best, we first combine the results of all the seeds, sorted by return type, $n$ used in $n$-steps and learning rate. We then calculate the mean over the rewards, and use this to determine which the best setup per return type.
 
-The results are displayed in the next table:
+|                                     | $n = 1$      | $n = 10$ | $n = 20$ | $n = 30$ | $n = 40$ | $n = 50$   | $n = 100$              | $n = 150$  | $n = 200$ |
+| ----------------------------------- | ------------ | -------- | -------- | -------- | -------- | ---------- | ---------------------- | ---------- | --------- |
+| **Generalized Advantage Estmation** | 0.03         | 0.01     | 0.01     | 0.01     | 0.03     | 0.01, 0.05 | 0.01, 0.03, 0.07, 0.09 | 0.03, 0.07 | 0.03      |
+| **Advantage Estimation**            | 0.001, 0.003 | 0.001    | 0.01     | 0.009    | 0.005    | 0.007      | 0.007                  | 0.005      | 0.009     |
 
-- Table 1: show best learning rates for GAE and AE per $n$ 
+> *[Table 1](#best_lr): Optimal learning rate per $n$-step. When there are multiple values present in a cell, the results were similar up to 1.0 difference in the return. An example for GAE, $n=150$; 0.03 yields a return of $180.7$ whereas 0.05 yields a return of $181.8$*.
+
+
 
 In this table we see that ..todo[learning rates can be set higher for higher $n$ in the case that GAE is used. This is due to the variance reduction properties of GAE]. 
 
 
 
-- Figure 1: multiple graphs showing returns for best learning rate of GAE and AE per $n$ including interval to show variance
+![Average Returns for different num steps](avg_return.png){#avg_returns }
+> *[Figure 1](#avg_returns): These results are for the CartPole-v0 environment. We show results for the best learning rate of the GAE and AE returns. The graphs show the mean with surrounding it one standard deviation. The $n=x$ labels refer to the $n$-step bootstrapping. The axis label "Number of steps (in thousands) refers to the steps taken in the environment themselves, and needs to also be multiplied by the number of agents. The y-axis is averaged over the seeds and the rewards observed at 1000-step interval.*
 
-Say something about achieved returns, good/not good. Why?
+Our graphs in [Figure 1](#avg_returns) show that GAE does not work for low values of $n$, we think this is due to the bias that is added by GAE, whilst already being biased. AE sometimes does manage to get high returns, because it is less biased, however displays very high variance. 
 
-Say something about variance for both methods. Something remarkable? 
+With $n=10$ GAE already has higher rewards and lower variance, however we see that from $n=20$ onwards it really starts to perform consistently good. This is not the case for regular AE, which seems to be harmed by larger values of $n$. 
+
+When $n>50$, it becomes more like Monte Carlo methods, which we can see as it learns slower, this is due to the higher variance MC methods have. Also, it waits longer to backup, which slows the online learning down.  
+
+When $n=200$ we are fully Monte Carlo, and what we see is that the variance is really reduced to a minimum, even though MC methods are inherently high variance. This shows that GAE is able to really reduce the variance, and is quite remarkable.
 
 
 
