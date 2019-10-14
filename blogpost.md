@@ -77,10 +77,10 @@ When we have found the optimal learning rates for the $n$-step bootstrapping met
 For our experiment we have chosen to use the CartPole-v0, and the MountainCar-v0 environments of the OpenAI gym python package.
 <div style="width:100%; display:table;">
 <div style="float: left; width:49%">
-<video loop="loop" poster="https://gym.openai.com/videos/2019-10-08--6QXvzzSWoV/CartPole-v1/poster.jpg" style="width:100%"><source src="https://gym.openai.com/videos/2019-10-08--6QXvzzSWoV/CartPole-v1/thumbnail.mp4" type="video/mp4"></video>
+<video controls autoplay loop="loop"  style="width:100%"><source src="https://gym.openai.com/videos/2019-10-08--6QXvzzSWoV/CartPole-v1/thumbnail.mp4" type="video/mp4"></video>
 </div>
 <div style="float: left; width:49%">
-<video loop="loop" poster="https://gym.openai.com/videos/2019-10-08--6QXvzzSWoV/MountainCar-v0/poster.jpg" style="width:100%"><source src="https://gym.openai.com/videos/2019-10-08--6QXvzzSWoV/MountainCar-v0/thumbnail.mp4" type="video/mp4"></video> 
+<video controls autoplay loop="loop" style="width:100%"><source src="https://gym.openai.com/videos/2019-10-08--6QXvzzSWoV/MountainCar-v0/thumbnail.mp4" type="video/mp4"></video> 
 </div>
 </div>
 This environment was chosen due to the simplicity of this environment while still having a quite large state space. More difficult environments have not been tested due to the limited time available for this project. 
@@ -110,33 +110,13 @@ The environments use seeds 16 to 31, where the seeds are determined by the numbe
 
 ## Results and Analysis
 
-Now it's time for the results! In order to determine which setup works best, we first combine the results of all the seeds, sorted by return type, $n$ used in $n$-steps and learning rate. We then calculate the mean over the rewards, and use this to show which setup works best per return type.
+To determine which setup works best, we first combine the results of all the seeds, sorted by return type, $n$ used in $n$-steps and learning rate. We then calculate the mean over the rewards, and use this to determine which the best setup per return type.
 
-The results are displayed in the next table: 
-
-- Table 1: show best learning rates for GAE and AE per $n$ 
-
-In this table we see that ..todo[learning rates can be set higher for higher $n$ in the case that GAE is used. This is due to the variance reduction properties of GAE]. 
+The results are displayed in the next table:
 
 
 
-- Figure 1: multiple graphs showing returns for best learning rate of GAE and AE per $n$
 
-Say something about achieved returns, good/not good. Why?
-
-Say something about variance for both methods. Something remarkable? 
-
-
-
-## Conclusion
-
-n < 1 : GAE werkt niet goed, denken high bias by bootstrapping
-
-n > 10: Lr kunnen hoger worden, bias lager door bootstrap over meer stappen. variance lager door GAE vandaar dat dit mogelijk is. 
-
-Limitations: 
-
-tijdnood, 1 env vanwege tijd. 5 seeds, ook tijdnood
 
 ## Citations
 
