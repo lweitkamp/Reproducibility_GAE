@@ -63,7 +63,7 @@ def GAE(next_value, rewards, values, gamma, GAE_lambda):
 
         gae = delta + gamma * GAE_lambda * gae
         returns.insert(0, gae)
-
+    
     return returns
 ```
 
@@ -71,22 +71,42 @@ Not *that* different when compared to the vanilla version, which makes it easy t
 
 ## Setup 
 
-To answer our research question "*What is the effect of (generalized) advantage estimation on the return in $n$-step bootstrapping?*", we will vary the learning rate over different $n$-step bootstrapping methods. When we have found the optimal learning rates for the $n$-step bootstrapping methods, we will compare the results of these methods with each other to determine the performance of the Advantage and Generalized Advantage Estimation as critics in an actor-critic algorithm. 
+To answer our research question "*What is the effect of (generalized) advantage estimation on the return in $n$-step bootstrapping?*", we will vary the learning rate over different $n$-step bootstrapping methods. 
+When we have found the optimal learning rates for the $n$-step bootstrapping methods, we will compare the results of these methods with each other to determine the performance of the Advantage and Generalized Advantage Estimation as critics in an actor-critic algorithm. 
 
-For our experiment we have chosen to use the CartPole-v0 environment of the OpenAI gym python package. This environment was chosen due to the simplicity of this environment while still having a quite large state space. More difficult environments have not been tested due to the limited time available for this project. 
+For our experiment we have chosen to use the CartPole-v0, and the MountainCar-v0 environments of the OpenAI gym python package.
+<div style="width:100%; display:table;">
+<div style="float: left; width:49%">
+<video loop="loop" poster="https://gym.openai.com/videos/2019-10-08--6QXvzzSWoV/CartPole-v1/poster.jpg" style="width:100%"><source src="https://gym.openai.com/videos/2019-10-08--6QXvzzSWoV/CartPole-v1/thumbnail.mp4" type="video/mp4"></video>
+</div>
+<div style="float: left; width:49%">
+<video loop="loop" poster="https://gym.openai.com/videos/2019-10-08--6QXvzzSWoV/MountainCar-v0/poster.jpg" style="width:100%"><source src="https://gym.openai.com/videos/2019-10-08--6QXvzzSWoV/MountainCar-v0/thumbnail.mp4" type="video/mp4"></video> 
+</div>
+</div>
+This environment was chosen due to the simplicity of this environment while still having a quite large state space. More difficult environments have not been tested due to the limited time available for this project. 
 
 In our experiment we performed a grid search over the learning rate and the n-step return. 
-For gamma we took 0.99 and for the lambda in GAE we took 0.97. Schulman et al. [^1]  show that these values work best with the GAE. The experiment first searches for the optimal learning rate for each $n$-step. The various numbers of $n$ are: $n \in \{1, 10, 20, 30, 40, 50, 100, 150, 200\}$. Note that $n=200$ corresponds to the MC estimate. For the learning rate we use $lr_A \in \{0.001, 0.003, 0.005, 0.007, 0.009, 0.01\}$ for the Advantage Estimation and $lr_{GAE} \in \{0.01, 0.03, 0.05, 0.07\}$. GAE uses a larger learning rate, because it reduces the variance more than the Advantage Estimation. This makes it able to use larger updates than the normal Advantage Estimation. 
+For gamma we took $0.99$ and for the lambda in GAE we took $0.97$. Schulman et al. [^1]  show that these values work best with the GAE. 
 
-Since this grid search is performed over 5 pytorch seeds, the search for these optimal parameters is qubic. To speed up the experiment somewhat, multi-threading of the environments was used, where 16 environments were played at the same time, all with their own seeds.
+The experiment first searches for the optimal learning rate for each $n$-step. The various numbers of $n$ are: $n \in \{1, 10, 20, 30, 40, 50, 100, 150, 200\}$. Note that $n=200$ corresponds to the MC estimate. 
+
+As learning rate for the regular Advantage Estimation we use $lr_A \in \{0.001, 0.003, 0.005, 0.007, 0.009, 0.01\}$.
+For the Generalized Advantage Estimation we use  $lr_{GAE} \in \{0.01, 0.03, 0.05, 0.07\}$. 
+
+GAE uses a larger learning rate, because it reduces the variance more than the Advantage Estimation. This makes it able to use larger updates than the normal Advantage Estimation. 
+
+The search for these optimal parameters is qubic, as we iterate over 3 separate parameters, namely $n$, $lr$ and pytorch random seeds. To speed up the experiment we use multi-threaded agents where 16 environments were played at the same time, all with their own seeds. Additionally, multi-threading leads to better estimates of the gradient and reduces variance, allowing for a higher learning rate and improving convergence. 
 
 ### Reproducibility
 
 To ensure reproducibility, we have manually set the seeds for pytorch and the gym environments. 
-We use seeds [0, 30, 60, 90, 120] for _PyTorch_ and *NumPy* and the environments use seeds 16 to 31, where the seeds are determined by the number of workers (environment instances) we have. 
-In our case this is 16, the seeds are calculated roughly as followed:
+We use in total 5 seeds, namely $[0, 30, 60, 90, 120]$, for _PyTorch_ and *NumPy*. 
+
+The environments use seeds 16 to 31, where the seeds are determined by the number of workers (environment instances) we have. In our case this is 16, the seeds are calculated as followed:
 
 ```seeds = [i + num_envs for i in range(num_envs)]```
+
+
 
 ## Results and Analysis
 
@@ -104,5 +124,3 @@ The results are displayed in the next table:
 [^2]: https://github.com/pytorch/examples/blob/master/reinforcement_learning/actor_critic.py
 [^3]: https://github.com/ikostrikov/pytorch-a3c
 [^4]: Actually, bootstrapping is what defines actor critic methods when contrasted to vanilla policy gradient methods.
-
-
