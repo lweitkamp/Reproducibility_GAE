@@ -123,7 +123,7 @@ To determine which setup works best, we first combine the results of all the see
 
 
 
-In this table we see that ..todo[learning rates can be set higher for higher $n$ in the case that GAE is used. This is due to the variance reduction properties of GAE]. 
+In [table 1](#best_lr) we see that [todo]
 
 
 
@@ -144,7 +144,7 @@ When $n=200$ we are fully Monte Carlo, and what we see is that the variance is r
 
 Our results indicate that..
 
-n < 1 : GAE results are bad [why?], this is probably due to the high bias of doing a one step bootstrap
+n < 10 : GAE results are bad [why?], this is probably due to the high bias of doing a one step bootstrap
 
 n > 10: Learning rates could be set higher for GAE, This is due to the lowering variance properties of GAE in combination with the bias reduction of a higher $n$. 
 
