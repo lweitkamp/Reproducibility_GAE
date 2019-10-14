@@ -116,8 +116,6 @@ n > 10: Lr kunnen hoger worden, bias lager door bootstrap over meer stappen. var
 
 Limitations: 
 
-
-
 tijdnood, 1 env vanwege tijd. 5 seeds, ook tijdnood
 
 ## Citations
