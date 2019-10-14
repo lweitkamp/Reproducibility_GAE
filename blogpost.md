@@ -152,7 +152,9 @@ Now it is important to keep in mind that the way these methods are tested is qui
 
 Also, specific for this environment, good to try these methods on other environments.
 
-## Citations
+
+
+
 
 [^1]:  Schulman, J., Moritz, P., Levine, S., Jordan, M., & Abbeel, P. (2015). High-dimensional continuous control using generalized advantage estimation. *arXiv preprint arXiv:1506.02438*.
 [^2]: https://github.com/pytorch/examples/blob/master/reinforcement_learning/actor_critic.py
