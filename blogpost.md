@@ -100,7 +100,7 @@ In this table we see that ..todo[learning rates can be set higher for higher $n$
 
 
 
-- Figure 1: multiple graphs showing returns for best learning rate of GAE and AE per $n$
+- Figure 1: multiple graphs showing returns for best learning rate of GAE and AE per $n$ including interval to show variance
 
 Say something about achieved returns, good/not good. Why?
 
@@ -110,13 +110,15 @@ Say something about variance for both methods. Something remarkable?
 
 ## Conclusion
 
+Our results indicate that..
+
 n < 1 : GAE werkt niet goed, denken high bias by bootstrapping
 
 n > 10: Lr kunnen hoger worden, bias lager door bootstrap over meer stappen. variance lager door GAE vandaar dat dit mogelijk is. 
 
-Limitations: 
+Now it is important to keep in mind that the way these methods are tested is quite limited. In this experiment the returns showed are averaged over a total of 5 seeds, which could give misleading results. 
 
-tijdnood, 1 env vanwege tijd. 5 seeds, ook tijdnood
+specific for this environment, good to try these methods on other environment.
 
 ## Citations
 
