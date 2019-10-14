@@ -132,13 +132,13 @@ Say something about variance for both methods. Something remarkable?
 
 Our results indicate that..
 
-n < 1 : GAE werkt niet goed, denken high bias by bootstrapping
+n < 1 : GAE results are bad [why?], this is probably due to the high bias of doing a one step bootstrap
 
-n > 10: Lr kunnen hoger worden, bias lager door bootstrap over meer stappen. variance lager door GAE vandaar dat dit mogelijk is. 
+n > 10: Learning rates could be set higher for GAE, This is due to the lowering variance properties of GAE in combination with the bias reduction of a higher $n$. 
 
 Now it is important to keep in mind that the way these methods are tested is quite limited. In this experiment the returns showed are averaged over a total of 5 seeds, which could give misleading results. 
 
-specific for this environment, good to try these methods on other environment.
+also, specific for this environment, good to try these methods on other environments.
 
 ## Citations
 
