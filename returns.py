@@ -14,20 +14,18 @@ import torch
 def returns():
     raise NotImplementedError
 
-def A(next_value, rewards, masks, values, args):
-    values = values + [next_value]
+def A(Rt, rewards, masks, values, args):
+    values = torch.stack(values)
+
     returns = []
     for step in reversed(range(len(rewards))):
-
-        Qsa = rewards[step] + args.gamma * values[step + 1] * masks[step]
-        Vs  = values[step]
-        A = Qsa - Vs
-        returns.insert(0, A)
+        Rt = rewards[step] + args.gamma * Rt * masks[step]
+        returns.insert(0, Rt)
 
     # Still normalize the returns
     returns = torch.stack(returns).detach()
     returns = (returns - returns.mean()) / (returns.std() + 1e-10)
-    return returns
+    return returns - values
 
 def Q(next_value, rewards, masks, values, args):
     values = values + [next_value]
