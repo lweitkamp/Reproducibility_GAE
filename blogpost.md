@@ -1,4 +1,7 @@
 # Measuring the Effect of Advantage Estimation in Actor-Critic methods
+*By Noah van Grinsven, Anton Steenvoorden, Tessa Wagenaar, Laurens Weitkamp.*
+
+
 
 For the reinforcement learning course at the UvA we are given the task of creating reproducible research, where we can choose from a number of topics. We have chosen to focus on $n-$step bootstrapping in actor-critic methods, which traditionally exhibit high variance for higher $n$ and high bias for lower $n$. In specific, we want to compare variance reduction methods such as the advantage estimation and the generalized advantage estimation. This naturally leads to the following question:
 
@@ -8,7 +11,7 @@ This blog post is meant to answer that question. First, we will give a quick ove
 
 ## Actor Critic Methods and Advantage Estimation
 
-In reinforcement learning we typically want to maximize the total expected reward, which can be done using various methods. We can for example choose to learn the value function(s) for each state and infer the policy from this, or learn the policy directly through parameterization of the policy. Actor critic methods combine the two approaches: the actor is a parameterized policy, the critic learns the value for each state through bootstrapping[^4]:
+In reinforcement learning we typically want to maximize the total expected reward, which can be done using various methods. We can for example choose to learn the value function(s) for each state and infer the policy from this, or learn the policy directly through parameterization of the policy. Actor critic methods combine the two approaches: the actor is a parameterized policy which outputs matches the number of actions ($a_t \in \mathcal{A}$), the critic learns the value for each state through bootstrapping[^4]:
 $$
 \begin{align*}
 \nabla_{\boldsymbol{\theta}} J(\boldsymbol{\theta})&= \mathbb{E}\left[ \sum_{t=0}^\infty \nabla_\theta \log \pi_\theta (a_t|s_t) \big(r_{t} + \gamma \hat{v}(s_{t+1})  \big)\right] \\
@@ -43,6 +46,8 @@ def A(next_value, rewards, values, gamma):
     return returns
 ```
 
+Where the rewards and values are vectors of size $\mathbb{R}^n$, and hence we go through the list in reverse order to properly discount each reward.
+
 ### Generalized Advantage Estimation
 
 We now turn to an idea proposed in the paper *High Dimensional Continuous Control Using Generalized Advantage Estimation*[^1] by Schulman et al. 2016. The advantage function reduces variance, but the authors claim we can do better: learn an exponentially-weighted estimator of the advantage function. This is what they call Generalized Advantage Estimation:
@@ -74,7 +79,14 @@ Not *that* different when compared to the vanilla version, which makes it easy t
 To answer our research question "*What is the effect of (generalized) advantage estimation on the return in $n$-step bootstrapping?*", we will vary the learning rate over different $n$-step bootstrapping methods. 
 When we have found the optimal learning rates for the $n$-step bootstrapping methods, we will compare the results of these methods with each other to determine the performance of the Advantage and Generalized Advantage Estimation as critics in an actor-critic algorithm. 
 
+### Environments
+
 For our experiment we have chosen to use the CartPole-v0, and the MountainCar-v0 environments of the OpenAI gym python package.
+
+The CartPole-v0 environment has two actions, namely push left and push right. The goal is to balance a pole on top of a cart (hence cartpole) for as long as possible (maximum of 200 time steps) and the input our agent receives is a vector of four values: pole position, cart velocity, pole angle and pole velocity at tip. A video of the environment with a random policy can be seen below on the left hand side.
+
+The MountainCar-v0 environment has three actions, namely push left, no push and push right. The goal is to push the car up the mountain and an episodes finishes when either this happens, or when 200 time steps have passed. Our agent receives an input vector of 2 values: the car's position and velocity. A video of the environment with a random policy can be seen below on the left hand side. Note that the agent gets no reward for going up the left side of the hill (but a steady -1 return for each step).
+
 <div style="width:100%; display:table;">
 <div style="float: left; width:49%">
 <video controls autoplay loop="loop"  style="width:100%"><source src="https://gym.openai.com/videos/2019-10-08--6QXvzzSWoV/CartPole-v1/thumbnail.mp4" type="video/mp4"></video>
@@ -83,14 +95,51 @@ For our experiment we have chosen to use the CartPole-v0, and the MountainCar-v0
 <video controls autoplay loop="loop" style="width:100%"><source src="https://gym.openai.com/videos/2019-10-08--6QXvzzSWoV/MountainCar-v0/thumbnail.mp4" type="video/mp4"></video> 
 </div>
 </div>
-*Videos taken from [OpenAI Gym](gym.openai.com)* 
+*Videos taken from [OpenAI Gym](https://gym.openai.com)* 
 
 These environments were chosen for their simplicity, while still having a quite large state space. More difficult environments have not been tested due to the limited time available for this project. 
 
-In our experiment we performed a grid search over the learning rate and the n-step return. 
-For gamma we took $0.99$ and for the lambda in GAE we took $0.97$. Schulman et al. [^1]  show that these values work best with the GAE. 
+### Actor-critic Implementation
 
-The experiment first searches for the optimal learning rate for each $n$-step. The various numbers of $n$ are: $n \in \{1, 10, 20, 30, 40, 50, 100, 150, 200\}$. Note that $n=200$ corresponds to the MC estimate. 
+We train the agent using a deep neural network where the input is transformed into shared features (a vector in $\mathbb{R}^{30}$), from which two heads form: the actor ($\in \mathbb{R}^{|\mathcal{A}|}$) and critic output ($\in \mathbb{R}$). A code snippet in PyTorch can be seen below, note that the output for the actor is a Softmax.
+
+```python
+import torch.nn as nn
+
+class ActorCriticMLP(nn.Module):
+    def __init__(self, input_dim, n_acts, n_hidden=32):
+        super(ActorCriticMLP, self).__init__()
+        self.input_dim = input_dim
+        self.n_acts = n_acts
+        self.n_hidden = n_hidden
+
+        self.features = nn.Sequential(
+            nn.Linear(self.input_dim, self.n_hidden),
+            nn.ReLU(),
+        )
+
+        self.value_function = nn.Sequential(
+            nn.Linear(self.n_hidden, 1)
+        )
+        self.policy = nn.Sequential(
+            nn.Linear(self.n_hidden, n_acts),
+            nn.Softmax(dim=0)
+        )
+
+    def forward(self, obs):
+        obs = obs.float()
+        obs = self.features(obs)
+        probs = self.policy(obs)
+        value = self.value_function(obs)
+        return probs, value
+```
+
+In our experiment we performed a grid search over the learning rate and the n-step return. 
+For gamma we took $0.99$ and for the lambda in GAE we took $0.97$, these values come recommended in the original paper for GAE[^1].
+
+### Parameter search
+
+The experiment first searches for the optimal learning rate for each $n$-step. The various numbers of $n$ are: $n \in \{1, 10, 20, 30, 40, 50, 100, 150, 200\}$. Note that $n=200$ corresponds to the MC estimate for both CartPole and MountainCar (as both environments terminate when reaching $t = 200$). 
 
 As learning rate for the regular Advantage Estimation we use $lr_A \in \{0.001, 0.003, 0.005, 0.007, 0.009, 0.01\}$.
 For the Generalized Advantage Estimation we use  $lr_{GAE} \in \{0.01, 0.03, 0.05, 0.07\}$. 
@@ -102,13 +151,9 @@ The search for these optimal parameters is qubic, as we iterate over 3 separate 
 ### Reproducibility
 
 To ensure reproducibility, we have manually set the seeds for pytorch and the gym environments. 
-We use in total 5 seeds, namely $[0, 30, 60, 90, 120]$, for _PyTorch_ and *NumPy*. 
-
-The environments use seeds 16 to 31, where the seeds are determined by the number of workers (environment instances) we have. In our case this is 16, the seeds are calculated as followed:
+We use in total 5 seeds, namely $[0, 30, 60, 90, 120]$, for _PyTorch_ and *NumPy*. The environments use seeds 16 to 31, where the seeds are determined by the number of workers (environment instances) we have. In our case this is 16, the seeds are calculated as followed:
 
 ```seeds = [i + num_envs for i in range(num_envs)]```
-
-
 
 ## Results and Analysis
 
