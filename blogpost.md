@@ -104,7 +104,7 @@ These environments were chosen for their simplicity, while still having a quite 
 
 ### Actor-critic Implementation
 
-We train the agent using a deep neural network where the input is transformed into shared features (a vector in $\mathbb{R}^{30}$), from which two heads form: the actor ($\in \mathbb{R}^{|\mathcal{A}|}$) and critic output ($\in \mathbb{R}$). A code snippet in PyTorch can be seen below. Note that the output for the actor is a Softmax.
+We train the agent using a deep neural network where the input is transformed into shared features (a vector in $\mathbb{R}^{30}$), from which two heads form: the actor ($\in \mathbb{R}^{|\mathcal{A}|}$) and critic ($\in \mathbb{R}$) output. A code snippet in PyTorch can be seen below. Note that the output for the actor is a Softmax.
 
 ```python
 import torch.nn as nn
@@ -162,10 +162,10 @@ We use in total 5 seeds, namely $[0, 30, 60, 90, 120]$, for _PyTorch_ and *NumPy
 
 To determine which setup works best, we first combine the results of all the seeds, sorted by return type, $n$ used in $n$-steps and learning rate. We then calculate the mean over the rewards, and use this to determine which the best setup per return type.
 
-|                                     | $n = 1$      | $n = 10$ | $n = 20$ | $n = 30$ | $n = 40$ | $n = 50$   | $n = 100$              | $n = 150$  | $n = 200$ |
-| ----------------------------------- | ------------ | -------- | -------- | -------- | -------- | ---------- | ---------------------- | ---------- | --------- |
-| **Generalized Advantage Estmation** | 0.03         | 0.01     | 0.01     | 0.01     | 0.03     | 0.01, 0.05 | 0.01, 0.03, 0.07, 0.09 | 0.03, 0.07 | 0.03      |
-| **Advantage Estimation**            | 0.001, 0.003 | 0.001    | 0.01     | 0.009    | 0.005    | 0.007      | 0.007                  | 0.005      | 0.009     |
+|                                     | $n = 1$ | $n = 10$ | $n = 20$ | $n = 30$ | $n = 40$ | $n = 50$   | $n = 100$              | $n = 150$  | $n = 200$ |
+| ----------------------------------- | ------- | -------- | -------- | -------- | -------- | ---------- | ---------------------- | ---------- | --------- |
+| **Generalized Advantage Estmation** | 0.03    | 0.01     | 0.01     | 0.01     | 0.03     | 0.01, 0.05 | 0.01, 0.03, 0.07, 0.09 | 0.03, 0.07 | 0.03      |
+| **Advantage Estimation**            | 0.002   | 0.003    | 0.003    | 0.003    | 0.003    | 0.003      | 0.003                  | 0.003      | 0.003     |
 
 > *[Table 1](#best_lr): Optimal learning rate per $n$-step. When there are multiple values present in a cell, the results were similar up to 1.0 difference in the return. An example for GAE, $n=150$; 0.03 yields a return of $180.7$ whereas 0.05 yields a return of $181.8$*.
 
