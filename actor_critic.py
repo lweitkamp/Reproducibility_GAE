@@ -3,7 +3,6 @@ from torch.distributions import Categorical
 import numpy as np
 import gym
 import torch
-from torch.utils.tensorboard import SummaryWriter
 
 from wrappers import make_env, SubprocVecEnv
 from models import ActorCriticMLP
@@ -22,7 +21,6 @@ def policy_gradient(logp_actions, returns):
 
 def train(args):
     print(args)
-    writer = SummaryWriter('runs')
     torch.manual_seed(args.seed)
     np.random.seed(args.seed)
 
@@ -54,10 +52,6 @@ def train(args):
             probs, state_value = policy.forward(obs)
             dist = Categorical(probs)
             action = dist.sample()
-            # try:
-            #     action = dist.sample()
-            # except:
-            #     print(obs, state_value, probs)
 
             obs, reward, done, _ = envs.step(action.numpy())
 
@@ -71,7 +65,6 @@ def train(args):
             if steps % args.test_every == 0:
                 test_reward = np.mean([test(test_env, policy) for _ in range(10)])
                 test_rewards.append(test_reward)
-                writer.add_scalar('rewards/test', float(test_reward), steps)
                 print(f"Running reward at timestep {steps}: and {test_reward}")
 
             if (1-done).sum() == 0:
@@ -86,7 +79,6 @@ def train(args):
 
         optim.zero_grad()
         loss.backward()
-        # torch.nn.utils.clip_grad_norm_(policy.parameters(), 10)
 
         optim.step()
         # if monte carlo, we need to reset the environment by hand
