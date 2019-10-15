@@ -54,7 +54,7 @@ We now turn to an idea proposed in the paper *High Dimensional Continuous Contro
 $$
 \hat{A}^{\text{GAE}(\gamma, \lambda)}_t = \sum^{\infty}_{l=0} (\gamma \lambda)^{l} \delta^V_{t+l}
 $$
-Where $\delta^V_{t} = r_t + \gamma V(s_{t+1}) - V(s_t)$ is the bootstrapped estimate for $\hat{A}_t$. The parameter $0 < \lambda < 1$ governs a trade-off between variance ($\lambda \approx 1$) and bias $(\lambda \approx 0)$. this is ***bias on top of bias***! But the authors note that it is a bias we can permit, as it reduces the variance to such a degree to enable quick learning. Additionally, the authors note that it is desireable to set $\lambda << \gamma$ as to balance bis and variance. In code, it looks like this:
+Where $\delta^V_{t} = r_t + \gamma V(s_{t+1}) - V(s_t)$ is the bootstrapped estimate for $\hat{A}_t$. The parameter $0 < \lambda < 1$ governs a trade-off between variance ($\lambda \approx 1$) and bias $(\lambda \approx 0)$. this is ***bias on top of bias***! But the authors note that it is a bias we can permit, as it reduces the variance to such a degree to enable quick learning. Additionally, the authors note that it is desireable to set $\lambda << \gamma$ as to balance bias and variance. In code, it looks like this:
 
 ```python
 def GAE(next_value, rewards, values, gamma, GAE_lambda):
@@ -72,7 +72,7 @@ def GAE(next_value, rewards, values, gamma, GAE_lambda):
     return returns
 ```
 
-Not *that* different when compared to the vanilla version, which makes it easy to implement.
+Not *that* different when compared to the vanilla version, which makes it easy to implement. <!-- Wat is bedoeld met deze zin? -->
 
 ## Setup 
 
@@ -168,14 +168,14 @@ To determine which setup works best, we first combine the results of all the see
 
 
 
-In [table 1](#best_lr) we see that [todo]
+For Generalized Advantage Estimation we see that around $n = 100 $ there is an optimum in the amount of learning rates that lead to the optimal returns. Also a wide range of learning rates seem to do the job. A reason could be that the bias-variance trade-off is balanced around that value for $n$.  <!-- Opmerking over de waarden bij Advantage Estimation, laatste seed moet nog worden verwerkt -->In the next figures we show the return for AE and GAE of the best learning rates per $n$-step.
 
 
 
 ![Average Returns for different num steps](avg_return.png){#avg_returns }
 > *[Figure 1](#avg_returns): These results are for the CartPole-v0 environment. We show results for the best learning rate of the GAE and AE returns. The graphs show the mean with surrounding it one standard deviation. The $n=x$ labels refer to the $n$-step bootstrapping. The axis label "Number of steps (in thousands) refers to the steps taken in the environment themselves, and needs to also be multiplied by the number of agents. The y-axis is averaged over the seeds and the rewards observed at 1000-step interval.*
 
-Our graphs in [Figure 1](#avg_returns) show that GAE does not work for low values of $n$, we think this is due to the bias that is added by GAE, whilst already being biased. AE sometimes does manage to get high returns, because it is less biased, however displays very high variance. 
+The graphs in [Figure 1](#avg_returns) show that GAE does not work for low values of $n$, we think this is due to the bias that is added by GAE, whilst already being biased. AE sometimes does manage to get high returns, because it is less biased, however displays very high variance. 
 
 With $n=10$ GAE already has higher rewards and lower variance, however we see that from $n=20$ onwards it really starts to perform consistently good. This is not the case for regular AE, which seems to be harmed by larger values of $n$. 
 
@@ -187,15 +187,15 @@ When $n=200$ we are fully Monte Carlo, and what we see is that the variance is r
 
 ## Conclusion
 
-Our results indicate that..
+Our results indicate that.. <!-- Todo -->
 
-n < 10 : GAE results are bad [why?], this is probably due to the high bias of doing a one step bootstrap
+>  n < 10 : GAE results are bad [why?], this is probably due to the high bias of doing a one step bootstrap
 
-n > 10: Learning rates could be set higher for GAE, This is due to the lowering variance properties of GAE in combination with the bias reduction of a higher $n$. 
+> n > 10: Learning rates could be set higher for GAE, This is due to the lowering variance properties of GAE in combination with the bias reduction of a higher $n$. 
 
 Now it is important to keep in mind that the way these methods are tested is quite limited. In this experiment the returns showed are averaged over a total of 5 seeds, which could give misleading results. 
 
-Also, specific for this environment, good to try these methods on other environments.
+Also, specific for this environment, good to try these methods on other environments. <!-- Of hebben we die toch wel?--> 
 
 
 
