@@ -150,23 +150,23 @@ We use in total 5 seeds, namely $[0, 30, 60, 90, 120]$, for _PyTorch_ and *NumPy
 
 ## Results and Analysis
 
-To determine which setup works best, we first combine the results of all the seeds, sorted by return type, $n$ used in $n$-steps and learning rate. We then calculate the mean over the rewards, and use this to determine which the best setup per return type. The results can be found in [Table 1](#best_lr).
+To determine which setup works best, we first combine the results of all the seeds, sorted by return type, $n$ used in $n$-steps and learning rate. We then calculate the mean over the rewards, and use this to determine which the best setup per return type. The results can be found in <a href="#best_lr">Table 1</a>.
 
 |                                      | $n = 1$      | $n = 10$ | $n = 20$ | $n = 30$ | $n = 40$ | $n = 50$   | $n = 100$              | $n = 150$  | $n = 200$ |
 | ------------------------------------ | ------------ | -------- | -------- | -------- | -------- | ---------- | ---------------------- | ---------- | --------- |
 | **Generalized Advantage Estimation** | 0.03         | 0.01     | 0.01     | 0.01     | 0.03     | 0.01, 0.05 | 0.01, 0.03, 0.07, 0.09 | 0.03, 0.07 | 0.03      |
 | **Advantage Estimation**             | 0.001, 0.003 | 0.001    | 0.01     | 0.009    | 0.005    | 0.007      | 0.007                  | 0.005      | 0.009     |
 
-> *[Table 1](#best_lr): Optimal learning rate per $n$-step. The value in each cell corresponds to learning rate which yielded the greatest average return. When there are multiple values present in a cell, the results were similar up to 1.0 difference in the return. An example for GAE, $n=150$; 0.03 yields a return of $180.7$ whereas 0.05 yields a return of $181.8$*.
+> *<span id="best_lr">Table 1</span>: Optimal learning rate per $n$-step. The value in each cell corresponds to learning rate which yielded the greatest average return. When there are multiple values present in a cell, the results were similar up to 1.0 difference in the return. An example for GAE, $n=150$; 0.03 yields a return of $180.7$ whereas 0.05 yields a return of $181.8$*.
 
 
 
 For Generalized Advantage Estimation we see that around $n = 100 $ there is an optimum in the amount of learning rates that lead to the optimal returns. Also a wide range of learning rates seem to do the job. A reason could be that the bias-variance trade-off is balanced around that value for $n$. In the next figures we show the return for AE and GAE of the best learning rates per $n$-step.
 
-![Average Returns for different num steps](avg_return.png){#avg_returns }
-> *[Figure 1](#avg_returns): These results are for the CartPole-v0 environment. We show results for the best learning rate of the GAE and AE returns. The graphs show the mean with surrounding it one standard deviation. The axis label "Number of steps (in thousands) refers to the steps taken in the environment themselves, and needs to also be multiplied by the number of agents. The y-axis is averaged over the seeds and the rewards observed at 1000-step interval. The returns are averaged by freezing the weights at each 1000th step and running an agent on 10 different episodes.*
+![Average Returns for different num steps](avg_return.png){#avg_returns}
+> *<span id="avg_returns">Figure 1<span>: These results are for the CartPole-v0 environment. We show results for the best learning rate of the GAE and AE returns. The graphs show the mean with surrounding it one standard deviation. The axis label "Number of steps (in thousands) refers to the steps taken in the environment themselves, and needs to also be multiplied by the number of agents. The y-axis is averaged over the seeds and the rewards observed at 1000-step interval. The returns are averaged by freezing the weights at each 1000th step and running an agent on 10 different episodes.*
 
-The learning curves have been plotted in [Figure 1](#avg_returns), which show that GAE does not work for low values of $n$. We hypothesize that this is due to the bias that is added by GAE, whilst already being biased, which leads to a quick divergence. AE sometimes does manage to get high returns, because it is less biased, however displays higher variance. This especially becomes clear for $n=10$. Using standard AE shows a higher average return and less variance than using GAE. 
+The learning curves have been plotted in <a href="#avg_returns">Figure 1</a>, which show that GAE does not work for low values of $n$. We hypothesize that this is due to the bias that is added by GAE, whilst already being biased, which leads to a quick divergence. AE sometimes does manage to get high returns, because it is less biased, however displays higher variance. This especially becomes clear for $n=10$. Using standard AE shows a higher average return and less variance than using GAE. 
 
 For $n>10$ using GAE already shows higher rewards and lower variance. It really starts to perform consistently good. This is not the case for regular AE, which seems to be harmed by larger values of $n$. 
 
