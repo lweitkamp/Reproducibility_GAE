@@ -164,7 +164,7 @@ To determine which setup works best, we first combine the results of all the see
 | **Generalized Advantage Estmation** | 0.03         | 0.01     | 0.01     | 0.01     | 0.03     | 0.01, 0.05 | 0.01, 0.03, 0.07, 0.09 | 0.03, 0.07 | 0.03      |
 | **Advantage Estimation**            | 0.001, 0.003 | 0.001    | 0.01     | 0.009    | 0.005    | 0.007      | 0.007                  | 0.005      | 0.009     |
 
-> *[Table 1](#best_lr): Optimal learning rate per $n$-step. When there are multiple values present in a cell, the results were similar up to 1.0 difference in the return. An example for GAE, $n=150$; 0.03 yields a return of $180.7$ whereas 0.05 yields a return of $181.8$*.
+> *[Table 1](#best_lr): Optimal learning rate per $n$-step. The value in each cell corresponds to learning rate which yielded the greatest average return. When there are multiple values present in a cell, the results were similar up to 1.0 difference in the return. An example for GAE, $n=150$; 0.03 yields a return of $180.7$ whereas 0.05 yields a return of $181.8$*.
 
 
 
