@@ -2,3 +2,4 @@ venv
 runs
 .idea
 __pycache__
+.DS_Store

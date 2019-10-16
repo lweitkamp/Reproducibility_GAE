@@ -1,16 +1,15 @@
 import argparse
 import os
-import sys
-from VPG import train
+from actor_critic import train
 
 # TO SPLIT UP THE COMPUTE, REMOVE THE RETURNS YOU ARE NOT GOING TO RUN
 # IF INTERUPTED: REMOVE THE learning_rates AND n_steps YOU HAVE DONE ALREADY TO CONTINUE WHERE YOU LEFT
 # ADJUST YOUR LEARNING RATES TO Q OR A OR GAE
 # learning_rates = [0.0001, 0.0003, 0.0005, 0.0009, 0.001, 0.003, 0.005, 0.007, 0.009, 0.01]
-learning_rates = [0.001, 0.003 ,0.005, 0.007, 0.009, 0.01]#[0.001, 0.003 ,0.005, 0.007, 0.009, 0.01]
-n_steps = [40, 50, 100, 150, 200]#[1, 10, 20, 30, 40, 50, 100, 150, 200]
-seeds = [30]# [0, 30, 60, 90, 120]
-returns = ["A"] #, "Q", "A", "GAE]
+learning_rates = [0.009, 0.002]
+n_steps = [1, 10, 20, 30, 40, 50, 100, 150, 200]
+seeds = [120] # [0, 30, 60, 90, 120]
+returns = ["GAE"]
 OUTPUT_FOLDER = "results"
 
 def write_to_file(filepath, results):
