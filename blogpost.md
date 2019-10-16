@@ -5,7 +5,7 @@
 
 <!--For the reinforcement learning course at the UvA we are given the task of creating reproducible research, where we can choose from a number of topics. We have chosen to focus on $n-$step bootstrapping in actor-critic methods, which traditionally exhibit high variance for higher $n$ and high bias for lower $n$. In specific, we want to compare variance reduction methods such as the advantage estimation and the generalized advantage estimation. This naturally leads to the following question:-->
 
-Nowadays many of the RL policy gradient methods use Generalized Advantage Estimation (GAE) as a baseline in actor-critic methods. Schulman et al.[^1] state that GAE reduces the variance while introducing little bias compared to other baselines, like advantage estimation. To check this we will focus on $n-$step bootstrapping in actor-critic methods, which traditionally exhibit high variance for higher $n$ and high bias for lower $n$. In specific, we want to compare variance reduction methods such as the advantage estimation and the generalized advantage estimation. This naturally leads to the following question:
+Nowadays many of the RL policy gradient methods use Generalized Advantage Estimation (GAE) as a baseline in actor-critic methods. Schulman et al.[^1] state that GAE reduces the variance while introducing little bias compared to other baselines, like advantage estimation. To check this we will focus on $n-$step bootstrapping in actor-critic methods, which traditionally exhibit high variance for higher $n$ and high bias for lower $n$. More specifically, we want to compare variance reduction methods, both the advantage estimation and the generalized advantage estimation. This naturally leads to the following question:
 
 *What is the effect of (generalized) advantage estimation on the return in $n$-step bootstrapping?*
 
@@ -56,7 +56,6 @@ We now turn to an idea proposed in the paper *High Dimensional Continuous Contro
 $$
 \hat{A}^{\text{GAE}(\gamma, \lambda)}_t = \sum^{\infty}_{l=0} (\gamma \lambda)^{l} \delta^V_{t+l}
 $$
-
 Where $\delta^V_{t} = r_t + \gamma V(s_{t+1}) - V(s_t)$ is the bootstrapped estimate for $\hat{A}_t$. The parameter $0 < \lambda < 1$ governs a trade-off between variance ($\lambda \approx 1$) and bias $(\lambda \approx 0)$. this is ***bias on top of bias***! But the authors note that it is a bias we can permit, as it reduces the variance to such a degree to enable quick learning. Additionally, the authors note that it is desirable to set $\lambda << \gamma$ as to balance bias and variance. In code, it looks like this:
 
 ```python
@@ -75,7 +74,7 @@ def GAE(next_value, rewards, values, gamma, GAE_lambda):
     return returns
 ```
 
-Not *that* different when compared to the vanilla version, which makes it easy to implement. <!-- Wat is bedoeld met deze zin? -->
+Not *that* different when compared to the vanilla version, which makes it easy to implement.
 
 ## Setup 
 
@@ -104,7 +103,7 @@ These environments were chosen for their simplicity, while still having a quite 
 
 ### Actor-critic Implementation
 
-We train the agent using a deep neural network where the input is transformed into shared features (a vector in $\mathbb{R}^{30}$), from which two heads form: the actor ($\in \mathbb{R}^{|\mathcal{A}|}$) and critic ($\in \mathbb{R}$) output. A code snippet in PyTorch can be seen below. Note that the output for the actor is a Softmax.
+We train the agent using a deep neural network where the input is transformed into shared features (a vector in $\mathbb{R}^{30}$), from which two heads form: the actor ($\in \mathbb{R}^{|\mathcal{A}|}$) and critic output ($\in \mathbb{R}$). A code snippet in PyTorch can be seen below. Note that the output for the actor is a Softmax.
 
 ```python
 import torch.nn as nn
@@ -162,23 +161,23 @@ We use in total 5 seeds, namely $[0, 30, 60, 90, 120]$, for _PyTorch_ and *NumPy
 
 To determine which setup works best, we first combine the results of all the seeds, sorted by return type, $n$ used in $n$-steps and learning rate. We then calculate the mean over the rewards, and use this to determine which the best setup per return type.
 
-|                                     | $n = 1$ | $n = 10$ | $n = 20$ | $n = 30$ | $n = 40$ | $n = 50$   | $n = 100$              | $n = 150$  | $n = 200$ |
-| ----------------------------------- | ------- | -------- | -------- | -------- | -------- | ---------- | ---------------------- | ---------- | --------- |
-| **Generalized Advantage Estmation** | 0.03    | 0.01     | 0.01     | 0.01     | 0.03     | 0.01, 0.05 | 0.01, 0.03, 0.07, 0.09 | 0.03, 0.07 | 0.03      |
-| **Advantage Estimation**            | 0.002   | 0.003    | 0.003    | 0.003    | 0.003    | 0.003      | 0.003                  | 0.003      | 0.003     |
+|                                     | $n = 1$      | $n = 10$ | $n = 20$ | $n = 30$ | $n = 40$ | $n = 50$   | $n = 100$              | $n = 150$  | $n = 200$ |
+| ----------------------------------- | ------------ | -------- | -------- | -------- | -------- | ---------- | ---------------------- | ---------- | --------- |
+| **Generalized Advantage Estmation** | 0.03         | 0.01     | 0.01     | 0.01     | 0.03     | 0.01, 0.05 | 0.01, 0.03, 0.07, 0.09 | 0.03, 0.07 | 0.03      |
+| **Advantage Estimation**            | 0.001, 0.003 | 0.001    | 0.01     | 0.009    | 0.005    | 0.007      | 0.007                  | 0.005      | 0.009     |
 
 > *[Table 1](#best_lr): Optimal learning rate per $n$-step. When there are multiple values present in a cell, the results were similar up to 1.0 difference in the return. An example for GAE, $n=150$; 0.03 yields a return of $180.7$ whereas 0.05 yields a return of $181.8$*.
 
 
 
-For Generalized Advantage Estimation we see that around $n = 100 $ there is an optimum in the amount of learning rates that lead to the optimal returns. Also a wide range of learning rates seem to do the job. A reason could be that the bias-variance trade-off is balanced around that value for $n$.  <!-- Opmerking over de waarden bij Advantage Estimation, laatste seed moet nog worden verwerkt -->In the next figures we show the return for AE and GAE of the best learning rates per $n$-step.
+In [table 1](#best_lr) we see that [todo]
 
 
 
 ![Average Returns for different num steps](avg_return.png){#avg_returns }
 > *[Figure 1](#avg_returns): These results are for the CartPole-v0 environment. We show results for the best learning rate of the GAE and AE returns. The graphs show the mean with surrounding it one standard deviation. The $n=x$ labels refer to the $n$-step bootstrapping. The axis label "Number of steps (in thousands) refers to the steps taken in the environment themselves, and needs to also be multiplied by the number of agents. The y-axis is averaged over the seeds and the rewards observed at 1000-step interval.*
 
-The graphs in [Figure 1](#avg_returns) show that GAE does not work for low values of $n$, we think this is due to the bias that is added by GAE, whilst already being biased. AE sometimes does manage to get high returns, because it is less biased, however displays very high variance. 
+Our graphs in [Figure 1](#avg_returns) show that GAE does not work for low values of $n$, we think this is due to the bias that is added by GAE, whilst already being biased. AE sometimes does manage to get high returns, because it is less biased, however displays very high variance. 
 
 With $n=10$ GAE already has higher rewards and lower variance, however we see that from $n=20$ onwards it really starts to perform consistently good. This is not the case for regular AE, which seems to be harmed by larger values of $n$. 
 
@@ -190,15 +189,15 @@ When $n=200$ we are fully Monte Carlo, and what we see is that the variance is r
 
 ## Conclusion
 
-Our results indicate that.. <!-- Todo -->
+Our results indicate that..
 
->  n < 10 : GAE results are bad [why?], this is probably due to the high bias of doing a one step bootstrap
+n < 10 : GAE results are bad [why?], this is probably due to the high bias of doing a one step bootstrap
 
-> n > 10: Learning rates could be set higher for GAE, This is due to the lowering variance properties of GAE in combination with the bias reduction of a higher $n$. 
+n > 10: Learning rates could be set higher for GAE, This is due to the lowering variance properties of GAE in combination with the bias reduction of a higher $n$. 
 
 Now it is important to keep in mind that the way these methods are tested is quite limited. In this experiment the returns showed are averaged over a total of 5 seeds, which could give misleading results. 
 
-Also, specific for this environment, good to try these methods on other environments. <!-- Of hebben we die toch wel?--> 
+Also, specific for this environment, good to try these methods on other environments.
 
 
 
