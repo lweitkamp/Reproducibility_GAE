@@ -3,13 +3,13 @@
 
 
 
-<!--For the reinforcement learning course at the UvA we are given the task of creating reproducible research, where we can choose from a number of topics. We have chosen to focus on $n-$step bootstrapping in actor-critic methods, which traditionally exhibit high variance for higher $n$ and high bias for lower $n$. In specific, we want to compare variance reduction methods such as the advantage estimation and the generalized advantage estimation. This naturally leads to the following question:-->
-
-Nowadays many of the RL policy gradient methods use Generalized Advantage Estimation (GAE) as a baseline in actor-critic methods. Schulman et al.[^1] state that GAE reduces the variance while introducing little bias compared to other baselines, like advantage estimation. To check this we will focus on $n-$step bootstrapping in actor-critic methods, which traditionally exhibit high variance for higher $n$ and high bias for lower $n$. More specifically, we want to compare variance reduction methods, both the advantage estimation and the generalized advantage estimation. This naturally leads to the following question:
+Nowadays many of the RL policy gradient methods use Generalized Advantage Estimation (GAE) as a baseline in actor-critic methods. [14:05, 10/16/2019] Laurens Weitkamp: Schulman et al.[^1] state that GAE reduces the variance of the policy gradient estimate when compared to other baselines, like advantage estimation. This comes at a cost, because GAE can introduce a bias into this estimate. To check this we will focus on $n-$step bootstrapping in actor-critic methods, which traditionally exhibit high variance for higher $n$ and high bias for lower $n$. More specifically, we want to compare variance reduction methods, both the advantage estimation and the generalized advantage estimation. This naturally leads to the following question:
 
 *What is the effect of (generalized) advantage estimation on the return in $n$-step bootstrapping?*
 
-This blogpost is meant to answer that question. First, we will give a quick overview of actor critic methods, $n$-step bootstrapping and the (generalized) advantage function. Second, we will discuss our setup which involves a detailed explanation of how the results can be reproduced. Third, we will give an analysis of the results which should answer the question above. Our code base can be found <a href="https://github.com/lweitkamp/Reproducibility_GAE">here</a>, which is inspired by other implementations[^2][^3].
+This blogpost is meant to answer that question. Since GAE reduces the variance, we expect it will improve the performance in high variance problems, so in $n$-step bootstrapping with a high $n$. However in the case of $n$-step bootstrapping with a low $n$, the variance will not be very high, but we will have some bias. If we now apply GAE in this problem, we will have bias on top of bias and thus expect GAE to perform worse. 
+
+First, we will give a quick overview of actor critic methods, $n$-step bootstrapping and the (generalized) advantage function. Second, we will discuss our setup which involves a detailed explanation of how the results can be reproduced. Third, we will give an analysis of the results which should answer the question above. Our code base can be found <a href="https://github.com/lweitkamp/Reproducibility_GAE">here</a>, which is inspired by other implementations[^2][^3].
 
 ## Actor Critic Methods and Advantage Estimation
 
