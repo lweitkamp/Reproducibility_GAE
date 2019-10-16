@@ -3,7 +3,7 @@
 
 
 
-Nowadays many of the RL policy gradient methods use Generalized Advantage Estimation (GAE) as a baseline in actor-critic methods. [14:05, 10/16/2019] Laurens Weitkamp: Schulman et al.[^1] state that GAE reduces the variance of the policy gradient estimate when compared to other baselines, like advantage estimation. This comes at a cost, because GAE can introduce a bias into this estimate. To check this we will focus on $n-$step bootstrapping in actor-critic methods, which traditionally exhibit high variance for higher $n$ and high bias for lower $n$. More specifically, we want to compare variance reduction methods, both the advantage estimation and the generalized advantage estimation. This naturally leads to the following question:
+Nowadays many of the RL policy gradient methods use Generalized Advantage Estimation (GAE) as a baseline in actor-critic methods. <!--[14:05, 10/16/2019] Laurens Weitkamp; whats this?--> : Schulman et al.[^1] state that GAE reduces the variance of the policy gradient estimate when compared to other baselines, like advantage estimation. This comes at a cost, because GAE can introduce a bias into this estimate. To check this we will focus on $n-$step bootstrapping in actor-critic methods, which traditionally exhibit high variance for higher $n$ and high bias for lower $n$. More specifically, we want to compare variance reduction methods, both the advantage estimation and the generalized advantage estimation. This naturally leads to the following question:
 
 *What is the effect of (generalized) advantage estimation on the return in $n$-step bootstrapping?*
 
@@ -170,36 +170,30 @@ To determine which setup works best, we first combine the results of all the see
 
 
 
-For Generalized Advantage Estimation we see that around $n = 100 $ there is an optimum in the amount of learning rates that lead to the optimal returns. Also a wide range of learning rates seem to do the job. A reason could be that the bias-variance trade-off is balanced around that value for $n$.  <!-- Opmerking over de waarden bij Advantage Estimation, laatste seed moet nog worden verwerkt -->In the next figures we show the return for AE and GAE of the best learning rates per $n$-step.
+For Generalized Advantage Estimation we see that around $n = 100 $ there is an optimum in the amount of learning rates that lead to the optimal returns. Also a wide range of learning rates seem to do the job. A reason could be that the bias-variance trade-off is balanced around that value for $n$. In the next figures we show the return for AE and GAE of the best learning rates per $n$-step.
 
 ![Average Returns for different num steps](avg_return.png){#avg_returns }
 > *[Figure 1](#avg_returns): These results are for the CartPole-v0 environment. We show results for the best learning rate of the GAE and AE returns. The graphs show the mean with surrounding it one standard deviation. The $n=x$ labels refer to the $n$-step bootstrapping. The axis label "Number of steps (in thousands) refers to the steps taken in the environment themselves, and needs to also be multiplied by the number of agents. The y-axis is averaged over the seeds and the rewards observed at 1000-step interval.*
 
 Our graphs in [Figure 1](#avg_returns) show that GAE does not work for low values of $n$, we think this is due to the bias that is added by GAE, whilst already being biased. AE sometimes does manage to get high returns, because it is less biased, however displays higher variance. This especially becomes clear for $n=10$. Using standard AE shows a higher average return and less variance than using GAE. 
 
-For $n>10$ using GAE already shows higher rewards and lower variance. it really starts to perform consistently good. This is not the case for regular AE, which seems to be harmed by larger values of $n$. 
+For $n>10$ using GAE already shows higher rewards and lower variance. It really starts to perform consistently good. This is not the case for regular AE, which seems to be harmed by larger values of $n$. 
 
-When $n>50$, the return becomes more like Monte Carlo methods, which we can see that the learning curve for GAE is less steep. There are more iterations needed to reach optimal behaviour. This is due to the higher variance MC methods have. Also, it waits longer to backup, which slows the online learning down.  
+When $n>50$, the return becomes more like Monte Carlo methods, we see that the learning curve for GAE is less steep i.e. more iterations are needed to reach optimal behaviour. This is due to the higher variance MC methods have. Also, it waits longer to backup, which slows the online learning down. 
 
-When $n=200$ we are fully Monte Carlo, and what we see is that the variance is really reduced to a minimum, even though MC methods are inherently high variance. This shows that GAE is able to really reduce the variance, and is quite remarkable. 
-
-
+For $n>100$ we see that both methods AE and GAE show lower returns and higher variance. Optimal is $n=100$ for which we see that the variance is really reduced to a minimum, even though high $n$-step/MC methods are inherently high variance. This shows that GAE is able to really reduce the variance, and is quite remarkable. 
 
 ## Conclusion
 
-Our results indicate that..
+*What is the effect of (generalized) advantage estimation on the return in $n$-step bootstrapping?*
 
-n < 10 : GAE results are bad [why?], this is probably due to the high bias of doing a one step bootstrap
+The idea of using GAE as a baseline in actor-critic methods is that is reduces variance while introducing a tolerable bit of bias compared to using the more standard AE. As $n$-step bootstrapping show high variance for higher $n$ and high bias for lower $n$ we hypothesised that GAE should work better for higher values of $n$.
 
-n > 10: Learning rates could be set higher for GAE, This is due to the lowering variance properties of GAE in combination with the bias reduction of a higher $n$. 
+What we see is that GAE does indeed outperform AE for higher value of $n$ as it shows much less variance. Also the learning curve for AE becomes gradually less steep when $n$-step approaches the MC method while this is not the case for GAE.
 
+ Too high value for $n$ ($>100$) -> GAE performs worse. Still better than AE
 
-
-GAE reduces variance + bias, higher n has more variance to reduce. That is why gae works better for high n. For lower n there is less variance to reduce but it induces extra bias. That is why we see that AE works better
-
-Now it is important to keep in mind that the way these methods are tested is quite limited. In this experiment the returns showed are averaged over a total of 5 seeds, which could give misleading results. 
-
-Also, specific for this environment, good to try these methods on other environments.
+Now it is important to keep in mind that the way these methods are tested is quite limited. In this experiment the returns showed are averaged over a total of 5 seeds, which could give misleading results. Also, the results obtained in this experiment could be specific for this environment. For further research we would suggest to test these methods on other environments to see if it generalises well.
 
 
 
