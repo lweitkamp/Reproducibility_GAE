@@ -13,7 +13,7 @@ First, we will give a quick overview of actor critic methods, $n$-step bootstrap
 
 ## Actor Critic Methods and Advantage Estimation
 
-In reinforcement learning we typically want to maximize the total expected reward, which can be done using various methods. We can for example choose to learn the value function(s) for each state and infer the policy from this, or learn the policy directly through parameterization of the policy. Actor-critic methods combine the two approaches: the actor is a parameterized policy whose output matches the number of actions ($a_t \in \mathcal{A}$), the critic learns the value for each state through bootstrapping[^4]:
+In reinforcement learning we typically want to maximize the total expected reward, which can be done using various methods. We can for example choose to learn the value function(s) for each state and infer the policy from this, or learn the policy directly through parameterization of the policy. Actor-critic methods combine the two approaches: the actor is a parameterized policy whose output matches the number of actions ($a_t \in \mathcal{A}$), the critic learns the value for each state through bootstrapping[^4]. We can write the loss function to this objective as $J(\boldsymbol{\theta})$, where we use gradient descent to maximize this objective:
 $$
 \begin{align*}
 \nabla_{\boldsymbol{\theta}} J(\boldsymbol{\theta})&= \mathbb{E}\left[ \sum_{t=0}^\infty \nabla_\theta \log \pi_\theta (a_t|s_t) \boldsymbol{\Psi}_t\right] \\
@@ -27,7 +27,7 @@ This estimate can be biased (due to estimation and bootstrapping) and can exhibi
 
 ### N-step bootstrapping
 
-Monte Carlo based methods have one big disadvantage: we have to wait for the end of an episode to perform a backup. We can tackle this disadvantage by performing $n$-step bootstrapping with $n \in \mathbb{N}$. There is of course no free lunch, and performing bootstrapping does have the effect of (possibly) inducing bias to our estimate (this is especially true for $n$ close to 1). If we combine actor-critic methods with $n-$step learning and advantage estimation, it is commonly known as advantage actor critic (A2C). 
+Monte Carlo based methods (such as actor critic) have one big disadvantage: we have to wait for the end of an episode to perform a backup. We can tackle this disadvantage by performing $n$-step bootstrapping with $n \in \mathbb{N}$. There is of course no free lunch, and performing bootstrapping does have the effect of (possibly) inducing bias to our estimate (this is especially true for $n$ close to 1). If we combine actor-critic methods with $n-$step learning and advantage estimation, it is commonly known as advantage actor critic (A2C). 
 
 In code, estimating the advantage function through bootstrapping looks like this:
 
@@ -46,11 +46,11 @@ Where the rewards and values are vectors of size $\mathbb{R}^n$, and hence we go
 
 ### Generalized Advantage Estimation
 
-We now turn to an idea proposed in the paper *High Dimensional Continuous Control Using Generalized Advantage Estimation*[^1] by Schulman et al. 2016. The advantage function reduces variance, but the authors claim we can use a better $\boldsymbol{\Psi}$ function: learn an exponentially-weighted estimator of the advantage function. This is what they call Generalized Advantage Estimation:
+We now turn to an idea proposed in the paper *High Dimensional Continuous Control Using Generalized Advantage Estimation*[^1] by Schulman et al. 2016. The advantage function reduces variance, but the authors claim we can use a better $\boldsymbol{\Psi}$ function: learn an exponentially-weighted estimator of the advantage function. This is what's called Generalized Advantage Estimation (GAE):
 $$
 \hat{A}^{\text{GAE}(\gamma, \lambda)}_t = \sum^{\infty}_{l=0} (\gamma \lambda)^{l} \delta^V_{t+l}
 $$
-Where $\delta^V_{t} = r_t + \gamma V(s_{t+1}) - V(s_t)$ is the bootstrapped estimate for $\hat{A}_t$. The parameter $0 < \lambda < 1$ governs a trade-off between variance ($\lambda \approx 1$) and bias $(\lambda \approx 0)$. Note that this is ***bias on top of bias***! But the authors note that it is a bias we can permit, as it reduces the variance to such a degree to enable quick learning. Additionally, the authors note that it is desirable to set $\lambda << \gamma$ as to balance bias and variance. In code, it looks like this:
+Where $\delta^V_{t} = r_t + \gamma \hat{v}(s_{t+1}) - \hat{v}(s_t)$ is the bootstrapped estimate for $\hat{A}_t$. The reduction of variance is due to exponentially weighting of (partially, we also use the rewards at each timestep) bootstrapped estimates. The parameter $0 < \lambda < 1$ governs a trade-off between variance ($\lambda \approx 1$) and bias $(\lambda \approx 0)$. Note that this is ***bias on top of bias***! But the authors note that it is a bias we can permit, as it reduces the variance to such a degree to enable quick learning. Additionally, the authors note that it is desirable to set $\lambda << \gamma$ as to balance bias and variance. In code, it looks like this:
 
 ```python
 def GAE(next_value, rewards, values, gamma, GAE_lambda):
@@ -182,7 +182,7 @@ For $n>100$ we see that both methods AE and GAE show lower returns and higher va
 
 The idea of using GAE as a baseline in actor-critic methods is that is reduces variance while introducing a tolerable amount of bias compared to using the more standard AE. As $n$-step bootstrapping show high variance for higher $n$ and high bias for lower $n$ we hypothesized that GAE should work better for higher values of $n$.
 
-What we see is that GAE does indeed outperform AE for higher value of $n$ as it shows much less variance. Also the learning curve for AE becomes gradually less steep when $n$-step approaches the MC method while this is not the case for GAE. However is the $n$ get too high, $n>100$, GAE will start to perform worse again, but will still be better than AE. 
+What we see is that GAE does indeed outperform AE for higher value of $n$ as it shows much less variance. Also the learning curve for AE becomes gradually less steep when $n$-step approaches the MC method while this is not the case for GAE. However if $n$ is set too high, $n>100$, GAE will start to perform worse again, but will still be better than AE. 
 
 Now it is important to keep in mind that the way these methods are tested is quite limited. In this experiment the returns showed are averaged over a total of 5 seeds, which could give misleading results. Also, the results obtained in this experiment could be specific for this environment. For further research we would suggest to test these methods on other environments to see if our conclusion generalizes well.
 
