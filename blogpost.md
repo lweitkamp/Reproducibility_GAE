@@ -18,7 +18,7 @@ $$
 \begin{align*}
 \nabla_{\boldsymbol{\theta}} J(\boldsymbol{\theta})&= \mathbb{E}\left[ \sum_{t=0}^\infty \nabla_\theta \log \pi_\theta (a_t|s_t) \boldsymbol{\Psi}_t\right] \\
 & \text{Where we have} \\
-\boldsymbol{\Psi}_t&= \sum^{n=1}_{l=0} r_t + \gamma r_{t+1} + \ldots + \gamma^{n-1} r_{t+n-1} + \gamma^n\hat{v}(s_{t+n})  - \hat{v}(s_t)
+\boldsymbol{\Psi}_t&= r_t + \gamma r_{t+1} + \ldots + \gamma^{n-1} r_{t+n-1} + \gamma^n\hat{v}(s_{t+n})  - \hat{v}(s_t)
 \end{align*}
 $$
 This choice of $\boldsymbol{\Psi}$ is commonly known as the advantage function. The Advantage function tells us how good an action $a$ was in state $s$ compared to how good the average of other actions are. So it tells us what the *advantage* of taking this action is. If the action taken in state $s$ leads to a high return, we would like to increase the probability of taking that action in state $s$.
