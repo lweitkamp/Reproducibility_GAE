@@ -73,7 +73,7 @@ def GAE(next_value, rewards, values, gamma, GAE_lambda):
 To answer our research question "*What is the effect of (generalized) advantage estimation on the return in $n$-step bootstrapping?*", we will vary the learning rate over different $n$-step bootstrapping methods. 
 When we have found the optimal learning rates for the $n$-step bootstrapping methods, we will compare the results of these methods with each other to determine the performance of the Advantage and Generalized Advantage Estimation as critics in an actor-critic algorithm. 
 
-### Environments
+### Environment
 
 For our experiment we have chosen to use the CartPole-v0 environment of the OpenAI gym python package[^5].
 
@@ -139,18 +139,18 @@ For the Generalized Advantage Estimation we use  $lr_{GAE} \in \{0.01, 0.03, 0.0
 
 GAE uses a larger learning rate, because it reduces the variance more than the Advantage Estimation. This makes it able to use larger updates than the normal Advantage Estimation. 
 
-The search for these optimal parameters is qubic, as we iterate over 3 separate parameters, namely $n$, $lr$ and pytorch random seeds. To speed up the experiment we use multi-threaded agents where 16 environments were played at the same time, all with their own seeds. Additionally, multi-threading leads to better estimates of the gradient and reduces variance, allowing for a higher learning rate and improving convergence. 
+The search for these optimal parameters is cubic, as we iterate over 3 separate parameters, namely $n$, $lr$ and PyTorch random seeds. To speed up the experiment we use multi-threaded agents where 16 environments were played at the same time, all with their own seeds. Additionally, multi-threading leads to better estimates of the gradient and reduces variance, allowing for a higher learning rate and improving convergence. 
 
 ### Reproducibility
 
-To ensure reproducibility, we have manually set the seeds for pytorch and the gym environments. 
+To ensure reproducibility, we have manually set the seeds for PyTorch and the gym environments. 
 We use in total 5 seeds, namely $[0, 30, 60, 90, 120]$, for _PyTorch_ and *NumPy*. The environments use seeds 16 to 31, where the seeds are determined by the number of workers (environment instances) we have. In our case this is 16, the seeds are calculated as followed:
 
 ```seeds = [i + num_envs for i in range(num_envs)]```
 
 ## Results and Analysis
 
-To determine which setup works best, we first combine the results of all the seeds, sorted by return type, $n$ used in $n$-steps and learning rate. We then calculate the mean over the rewards, and use this to determine which the best setup per return type. The results can be found in <a href="#best_lr">Table 1</a>.
+To determine which setup works best, we first combine the results of all the seeds, sorted by return type, $n$ used in $n$-steps and learning rate. We then calculate the mean over the rewards, and use this to determine the best setup per return type. The results can be found in <a href="#best_lr">Table 1</a>.
 
 |                                      | $n = 1$      | $n = 10$ | $n = 20$ | $n = 30$ | $n = 40$ | $n = 50$   | $n = 100$              | $n = 150$  | $n = 200$ |
 | ------------------------------------ | ------------ | -------- | -------- | -------- | -------- | ---------- | ---------------------- | ---------- | --------- |
@@ -161,7 +161,9 @@ To determine which setup works best, we first combine the results of all the see
 
 
 
-For Generalized Advantage Estimation we see that around $n = 100 $ there is an optimum in the amount of learning rates that lead to the optimal returns. Also a wide range of learning rates seem to do the job. A reason could be that the bias-variance trade-off is balanced around that value for $n$. In the next figures we show the return for AE and GAE of the best learning rates per $n$-step.
+For Generalized Advantage Estimation we see that, around $n = 100 $, there is an optimum in the amount of learning rates that lead to the optimal returns. For this $n$, many different learning rates lead to a good performance. A reason for this could be that the bias-variance trade-off is balanced here. In the next figures we show the return for AE and GAE of the best learning rates per $n$-step.
+
+
 
 ![Average Returns for different num steps](avg_return.png){#avg_returns}
 > *<span id="avg_returns">Figure 1<span>: These results are for the CartPole-v0 environment. We show results for the best learning rate of the GAE and AE returns. The graphs show the mean with surrounding it one standard deviation. The axis label "Number of steps (in thousands) refers to the steps taken in the environment themselves, and needs to also be multiplied by the number of agents. The y-axis is averaged over the seeds and the rewards observed at 1000-step interval. The returns are averaged by freezing the weights at each 1000th step and running an agent on 10 different episodes.*
@@ -178,13 +180,11 @@ For $n>100$ we see that both methods AE and GAE show lower returns and higher va
 
 *What is the effect of (generalized) advantage estimation on the return in $n$-step bootstrapping?*
 
-The idea of using GAE as a baseline in actor-critic methods is that is reduces variance while introducing a tolerable bit of bias compared to using the more standard AE. As $n$-step bootstrapping show high variance for higher $n$ and high bias for lower $n$ we hypothesised that GAE should work better for higher values of $n$.
+The idea of using GAE as a baseline in actor-critic methods is that is reduces variance while introducing a tolerable amount of bias compared to using the more standard AE. As $n$-step bootstrapping show high variance for higher $n$ and high bias for lower $n$ we hypothesized that GAE should work better for higher values of $n$.
 
-What we see is that GAE does indeed outperform AE for higher value of $n$ as it shows much less variance. Also the learning curve for AE becomes gradually less steep when $n$-step approaches the MC method while this is not the case for GAE.
+What we see is that GAE does indeed outperform AE for higher value of $n$ as it shows much less variance. Also the learning curve for AE becomes gradually less steep when $n$-step approaches the MC method while this is not the case for GAE. However is the $n$ get too high, $n>100$, GAE will start to perform worse again, but will still be better than AE. 
 
- Too high value for $n$ ($>100$) -> GAE performs worse. Still better than AE
-
-Now it is important to keep in mind that the way these methods are tested is quite limited. In this experiment the returns showed are averaged over a total of 5 seeds, which could give misleading results. Also, the results obtained in this experiment could be specific for this environment. For further research we would suggest to test these methods on other environments to see if it generalises well.
+Now it is important to keep in mind that the way these methods are tested is quite limited. In this experiment the returns showed are averaged over a total of 5 seeds, which could give misleading results. Also, the results obtained in this experiment could be specific for this environment. For further research we would suggest to test these methods on other environments to see if our conclusion generalizes well.
 
 
 
