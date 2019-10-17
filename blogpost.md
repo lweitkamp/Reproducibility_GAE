@@ -165,8 +165,8 @@ For Generalized Advantage Estimation we see that, around $n = 100 $, there is an
 
 
 
-![Average Returns for different num steps](avg_return.png){#avg_returns}
-> *<span id="avg_returns">Figure 1<span>: These results are for the CartPole-v0 environment. We show results for the best learning rate of the GAE and AE returns. The graphs show the mean with surrounding it one standard deviation. The axis label "Number of steps (in thousands) refers to the steps taken in the environment themselves, and needs to also be multiplied by the number of agents. The y-axis is averaged over the seeds and the rewards observed at 1000-step interval. The returns are averaged by freezing the weights at each 1000th step and running an agent on 10 different episodes.*
+![Average Returns for different num steps](avg_return.png)
+> *<span id="avg_returns">Figure 1</span>: These results are for the CartPole-v0 environment. We show results for the best learning rate of the GAE and AE returns. The graphs show the mean with surrounding it one standard deviation. The axis label "Number of steps (in thousands) refers to the steps taken in the environment themselves, and needs to also be multiplied by the number of agents. The y-axis is averaged over the seeds and the rewards observed at 1000-step interval. The returns are averaged by freezing the weights at each 1000th step and running an agent on 10 different episodes.*
 
 The learning curves have been plotted in <a href="#avg_returns">Figure 1</a>, which show that GAE does not work for low values of $n$. We hypothesize that this is due to the bias that is added by GAE, whilst already being biased, which leads to a quick divergence. AE sometimes does manage to get high returns, because it is less biased, however displays higher variance. This especially becomes clear for $n=10$. Using standard AE shows a higher average return and less variance than using GAE. 
 
@@ -188,8 +188,27 @@ Now it is important to keep in mind that the way these methods are tested is qui
 
 
 
+
+
+<link rel="stylesheet" href="https://unpkg.com/applause-button/dist/applause-button.css" />
+
+<script src="https://unpkg.com/applause-button/dist/applause-button.js"></script>
+<style>
+  applause-button .count-container {
+    margin:0 auto;
+  }
+  applause-button .count-container .count {
+    text-size:1.2em;
+  }
+</style>
+<div>
+<applause-button url="antonsteenvoorden.nl" multiclap="true" style="margin: 0 auto; width: 58px; height: 58px;"/>
+</div>
+
+
 [^1]:  Schulman, J., Moritz, P., Levine, S., Jordan, M., & Abbeel, P. (2015). High-dimensional continuous control using generalized advantage estimation. *arXiv preprint arXiv:1506.02438*.
 [^2]: https://github.com/pytorch/examples/blob/master/reinforcement_learning/actor_critic.py
 [^3]: https://github.com/ikostrikov/pytorch-a3c
 [^4]: Actually, bootstrapping is what defines actor critic methods when contrasted to vanilla policy gradient methods.
 [^5]: For the sake of completeness, we have briefly tested the model on a different environment, MountaintCar-v0, but we did not manage to converge for a selection of learning rates and $n$-steps in due time for this project.
+
