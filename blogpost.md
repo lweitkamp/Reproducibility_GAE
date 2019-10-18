@@ -172,7 +172,7 @@ The learning curves have been plotted in <a href="#avg_returns">Figure 1</a>, wh
 
 For $n>10$ using GAE already shows higher rewards and lower variance. It really starts to perform consistently good. This is not the case for regular AE, which seems to be harmed by larger values of $n$. 
 
-When $n>50$, the return becomes more like Monte Carlo methods, we see that the learning curve for GAE is less steep i.e. more iterations are needed to reach optimal behaviour. This is due to the higher variance MC methods have. Also, it waits longer to backup, which slows the online learning down. 
+For $n>50$, the return becomes more like Monte Carlo methods, we see that the learning curve for GAE is less steep i.e. more iterations are needed to reach optimal behaviour. This is due to the higher variance MC methods have. Also, it waits longer to backup, which slows the online learning down. 
 
 For $n>100$ we see that both methods AE and GAE show lower returns and higher variance. Optimal is $n=100$ for which we see that the variance is really reduced to a minimum, even though high $n$-step/MC methods are inherently high variance. This shows that GAE is able to really reduce the variance, and is quite remarkable. 
 
